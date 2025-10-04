@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "./layout/Layout.jsx";
 import Proyect from "./pages/proyect.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css'; 
+
 
 const router = createBrowserRouter([
   {
