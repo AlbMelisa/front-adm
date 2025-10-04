@@ -4,12 +4,13 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "./layout/Layout.jsx";
 import Proyect from "./pages/proyect.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
+import Login from "./pages/login/Login.jsx";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <Login />,
     children:[
       {
         path: '/',
