@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
 import './App.css'
 
 function App() {
@@ -7,8 +7,9 @@ function App() {
 
   return (
     <>
-    
+     <h1>hola como estas</h1>
     </>
   )
 }
 
+export default App
