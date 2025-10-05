@@ -30,7 +30,8 @@
    -------------------------------------- */
 .login-card {
     width: 100%;
-    max-width: 400px; /* Ancho máximo para la tarjeta */
+    padding: 10px;
+    max-width: 450px; /* Ancho máximo para la tarjeta */
     border-radius: 15px; /* Bordes más redondeados */
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
     z-index: 1; /* Asegura que la tarjeta esté encima de las olas */
