@@ -18,16 +18,23 @@ const Layout = () => {
                   location.pathname === "/" ? "menu-selected" : "option1"
                 }
               >
-                <NavLink to="/">Proyectos</NavLink>
+                <NavLink to="/">Inicio</NavLink>
               </li>
               <li
                 className={
-                  location.pathname === "/students"
-                    ? "menu-selected-stu"
-                    : "option2"
+                  location.pathname === "/proyectslist" ? "menu-selected" : "option2"
                 }
               >
-                <NavLink to="/students">Reportes</NavLink>
+                <NavLink to="/proyectslist">Proyectos</NavLink>
+              </li>
+              <li
+                className={
+                  location.pathname === "/reports"
+                    ? "menu-selected-stu"
+                    : "option3"
+                }
+              >
+                <NavLink to="/reports">Reportes</NavLink>
               </li>
             </ul>
           </nav>
