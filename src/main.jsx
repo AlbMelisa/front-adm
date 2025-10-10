@@ -6,25 +6,26 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from "./pages/login/Login.jsx";
 import Reports from "./pages/reports/Reports.jsx";
 import ProyectList from "./pages/proyectlist/ProyectList.jsx";
-import Home from "./pages/Home/Home.jsx";
 import Proyect from "./pages/proyect/Proyect.jsx";
+import HomePage from "./pages/home/HomePage.jsx";
+import Sidebar from "./sidebar/Sidebar.jsx";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <Sidebar />,
     children:[
       {
         path: '/',
-        element: <Home/>
+        element: <HomePage/>
       },
       {
         path: '/proyectslist',
         element: <ProyectList/>
       },
       {
-        path: '/proyect/:id',
+        path: '/proyectslist/proyect/:id',
         element: <Proyect/>
       },
       {

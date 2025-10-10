@@ -2,5 +2,20 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+}
 
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+
+.layout-main-content {
+  flex: 1;
+  background-color: #f5e8ff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }

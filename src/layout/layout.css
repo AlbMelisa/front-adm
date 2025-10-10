@@ -3,24 +3,46 @@
   display: flex;
 }
 
-.layout-menu {
+/* .layout-menu {
   width: 180px;
   height: 100vh;
   background: linear-gradient(to bottom, #18012b, #49246d);
   color: rgb(187, 168, 168);
   padding: 20px 10px 10px 10px ;
   box-shadow: 0px 0px 0px #b28e8ebf;
+} */
+.layout-menu{
+  width: 230px;
+  height: 100vh;
+  background-color: #4c1d95; /* violeta oscuro */
+  color: white;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  flex-direction: column;
 }
-
+.layout-title{
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
 .layout-menu nav ul{
    padding: 0;
 }
 
 .layout-menu nav ul li {
-  list-style: none;
+  /* list-style: none;
   width: 100%;
-  /* font-weight: 700; */
-  padding: 10px 0 10px 10px;  
+  /* font-weight: 700; 
+  padding: 10px 0 10px 10px;   */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  color: #e9d5ff;
+  cursor: pointer;
+  transition: background-color 0.3s;
   
 }
 
@@ -59,7 +81,8 @@
 } */
 
 .option1:hover,
-.option2:hover {
+.option2:hover,
+.option3:hover{
   background-color: rgb(82, 9, 113);
   display: block;
 }
@@ -70,22 +93,19 @@
 }
 
 
-.option1, .option2 {
+.option1, .option2,.option3 {
   list-style: none;
   margin: 0; 
   padding: 0; 
   
 }
 
-.option1 a, .option2 a {
+.option1 a, .option2, .option3 a {
   text-decoration: none;
   color: inherit; 
   
 }
 
 .layout-main-content {
-  flex: 1; 
-background-color: #dbd1dc; 
-  width: 200px;
-
+  flex: 1,
 }

@@ -104,7 +104,7 @@ const ListProyects = () => {
             </thead>
             <tbody>
               {proyectosPagina.map((p) => (
-                <tr key={p.id} onClick={() => navigate(`/proyect/${p.id}`)
+                <tr key={p.id} onClick={() => navigate(`/proyectslist/proyect/${p.id}`)
                         }>
                   <td>{p.id}</td>
                   <td>{p.nombre}</td>
