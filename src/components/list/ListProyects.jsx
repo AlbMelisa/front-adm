@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Table, Pagination, Dropdown, Form, Spinner, Button } from "react-bootstrap";
+import {
+  Table,
+  Pagination,
+  Dropdown,
+  Form,
+  Spinner,
+  Button,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
 // import axios from "axios"; // ← si preferís usar axios
 
 const ListProyects = () => {
   // Estado para los proyectos
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [proyectos, setProyectos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
@@ -13,34 +20,14 @@ const ListProyects = () => {
 
   const proyectosPorPagina = 5;
 
-  // 🔹 Datos de ejemplo (modo local)
-  const proyectosMock = [
-    { id: 1, nombre: "Sistema de Gestión Interna", fecha: "15-01-2023", estado: "En Planificación", equipo: 1, cliente: "20345678901" },
-    { id: 2, nombre: "Red de Comunicaciones Externas", fecha: "01-03-2023", estado: "En Planificación", equipo: 2, cliente: "20234567891" },
-    { id: 3, nombre: "Migración a la Nube", fecha: "10-04-2023", estado: "En Planificación", equipo: 3, cliente: "20398765432" },
-    { id: 4, nombre: "Sistema de Soporte Técnico", fecha: "20-08-2023", estado: "Terminado", equipo: 4, cliente: "20312345678" },
-    { id: 5, nombre: "Desarrollo de Aplicación Móvil", fecha: "30-07-2023", estado: "En Planificación", equipo: 5, cliente: "20456789012" },
-    { id: 6, nombre: "Gestor de Autos Volkswagen", fecha: "27-11-2024", estado: "En curso", equipo: 6, cliente: "20298765432" },
-    { id: 7, nombre: "Gestor de Ropa", fecha: "28-11-2024", estado: "Terminado", equipo: 7, cliente: "20234567891" },
-  ];
-
   // 🔹 useEffect para cargar los datos
   useEffect(() => {
     setCargando(true);
 
-    // --- 🔸 OPCIÓN 1: Datos locales ---
-    setTimeout(() => {
-      setProyectos(proyectosMock);
-      setCargando(false);
-    }, 800);
-
-    // --- 🔸 OPCIÓN 2: Cargar desde API (descomentar cuando tengas endpoint) ---
-    /*
     const fetchData = async () => {
       try {
         setCargando(true);
-        const response = await fetch("https://tuservidor.com/api/proyectos");
-        // const response = await axios.get("https://tuservidor.com/api/proyectos");
+        const response = await fetch("http://localhost:3001/proyectos");
         const data = await response.json();
         setProyectos(data);
       } catch (error) {
@@ -50,13 +37,12 @@ const ListProyects = () => {
       }
     };
     fetchData();
-    */
   }, []);
 
   // 🔹 Filtrar proyectos por búsqueda
   const proyectosFiltrados = proyectos.filter(
     (p) =>
-      p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      p.nombreProyecto.toLowerCase().includes(busqueda.toLowerCase()) ||
       p.id.toString().includes(busqueda)
   );
 
@@ -64,15 +50,53 @@ const ListProyects = () => {
   const indexUltimo = paginaActual * proyectosPorPagina;
   const indexPrimero = indexUltimo - proyectosPorPagina;
   const proyectosPagina = proyectosFiltrados.slice(indexPrimero, indexUltimo);
-  const totalPaginas = Math.ceil(proyectosFiltrados.length / proyectosPorPagina);
+  const totalPaginas = Math.ceil(
+    proyectosFiltrados.length / proyectosPorPagina
+  );
 
   const handlePagina = (numero) => setPaginaActual(numero);
 
+  const handleEstadoChange = async (projectId, nuevoEstado) => {
+
+    const datosActualizados = {
+      estado: nuevoEstado
+    };
+
+    try {
+      const response = await fetch(
+        `http://localhost:3001/proyectos/${projectId}`,
+        {
+          method: "PATCH", 
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datosActualizados),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error al actualizar estado: ${response.status}`);
+      }
+
+      // 2. Obtener el proyecto actualizado (opcional, pero buena práctica)
+      const proyectoActualizado = await response.json();
+
+      // 3. Actualizar el estado local (MUY IMPORTANTE)
+      setProyectos((prevProyectos) =>
+        prevProyectos.map((p) => (p.id === projectId ? proyectoActualizado : p))
+      );
+    } catch (error) {
+      console.error("Error al guardar el estado:", error);
+      // Aquí podrías mostrar una notificación de error al usuario
+    }
+  };
   return (
     <div className="container mt-4">
       <div className="d-flex mb-3 justify-content-between">
         <h4 className="mb-3">Proyectos Registrados</h4>
-        <Button variant="secondary">Nuevo Proyecto</Button>
+        <Button 
+        variant="secondary" 
+        onClick={() =>navigate(`/proyectslist/proyect/create`)}>Nuevo Proyecto</Button>
       </div>
 
       <Form.Control
@@ -103,35 +127,58 @@ const ListProyects = () => {
               </tr>
             </thead>
             <tbody>
-              {proyectosPagina.map((p) => (
-                <tr key={p.id} onClick={() => navigate(`/proyectslist/proyect/${p.id}`)
-                        }>
-                  <td>{p.id}</td>
-                  <td>{p.nombre}</td>
-                  <td>{p.fecha}</td>
-                  <td>
-                    <Form.Select size="sm" defaultValue={p.estado}>
-                      <option>En Planificación</option>
-                      <option>En curso</option>
-                      <option>Terminado</option>
-                    </Form.Select>
-                  </td>
-                  <td>{p.equipo}</td>
-                  <td>{p.cliente}</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="warning" size="sm">
-                        Opciones
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item>Ver detalles</Dropdown.Item>
-                        <Dropdown.Item>Editar</Dropdown.Item>
-                        <Dropdown.Item>Eliminar</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+              {proyectosPagina && proyectosPagina.length > 0 ? (
+                // --- Caso 1: Hay proyectos para mostrar ---
+                proyectosPagina.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.idProyecto}</td>
+                    <td>{p.nombreProyecto}</td>
+                    <td>{p.fechaInicioProyecto}</td>
+                    <td>
+                      <Form.Select
+                        size="sm"
+                        defaultValue={p.estadoProyecto}
+                        onChange={(e) =>
+                          handleEstadoChange(p.id, e.target.value)
+                        }
+                      >
+                        <option>En Planificación</option>
+                        <option>En curso</option>
+                        <option>Terminado</option>
+                      </Form.Select>
+                    </td>
+                    <td>{p.idEquipo}</td>
+                    <td>{p.idCliente}</td>
+                    <td>
+                      <Dropdown>
+                        <Dropdown.Toggle variant="warning" size="sm">
+                          Opciones
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item
+                            onClick={() =>
+                              navigate(`/proyectslist/proyect/${p.id}`)
+                            }
+                          >
+                            Ver detalles
+                          </Dropdown.Item>
+                          <Dropdown.Item>Editar</Dropdown.Item>
+                          <Dropdown.Item>Eliminar</Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                // --- Caso 2: El arreglo está vacío (o es null/undefined) ---
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    {/* El mensaje centralizado */}
+                    <h3>⚠️ No existen proyectos cargados aún.</h3>
+                    <p>Comienza creando un nuevo proyecto para verlo aquí.</p>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
 
@@ -162,4 +209,3 @@ const ListProyects = () => {
 };
 
 export default ListProyects;
-

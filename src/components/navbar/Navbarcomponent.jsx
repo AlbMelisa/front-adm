@@ -2,8 +2,9 @@ import React from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
+import { FaRegUserCircle } from "react-icons/fa";
 import "../navbar/navbarcomponent.css";
-const Navbarcomponent = ({ userName = "Mauro" }) => {
+const Navbarcomponent = ({ userName = "Usuario" }) => {
   return (
     <Navbar className="custom-navbar" expand="lg" data-bs-theme="light">
       <Container
@@ -16,17 +17,17 @@ const Navbarcomponent = ({ userName = "Mauro" }) => {
           <div className="logo-placeholder me-2">
             {/* Placeholder para tu logo */}
           </div>
-          <span className="small-text">SS Mobile</span>
+          <span className="small-text">GYM SOFTWARE</span>
         </Navbar.Brand>
 
         {/* Usamos un <div> en lugar de Nav para centrar el mensaje de bienvenida */}
         <div className="welcome-message">
           <div className="d-flex align-items-center">
-            {/* Ícono de Persona (Puedes reemplazar con un ícono real de librería) */}
-            <div className="person-icon-placeholder me-2">
-              {/* Icono de Persona */}
-            </div>
-            <span>Bienvenido **"{userName}"**</span>
+            {/* 1. Icono de Persona (FaRegUserCircle de react-icons) */}
+            <FaRegUserCircle size={24} className="me-2" />
+
+            {/* 2. Mensaje de Bienvenida al Usuario */}
+            <span>Bienvenido {userName}</span>
           </div>
         </div>
 

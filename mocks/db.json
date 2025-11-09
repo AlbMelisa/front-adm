@@ -1,0 +1,121 @@
+{
+  "proyectos": [
+    {
+      "id": "0d7b",
+      "idProyecto": 1,
+      "idEquipo": 101,
+      "idCliente": 501,
+      "nombreProyecto": "Migración a la Nube V3",
+      "tipoProyecto": "Infraestructura Cloud",
+      "estadoProyecto": "En Progreso",
+      "fechaInicioProyecto": "2024-09-01",
+      "fechaFinProyecto": "2025-03-31",
+      "presupuestoProyecto": 150000,
+      "prioridadProyecto": 5,
+      "descripcionProyecto": "Traslado de todos los microservicios a la nueva arquitectura de contenedores en AWS.",
+      "estado": "Terminado"
+    },
+    {
+      "idProyecto": 2,
+      "idEquipo": 102,
+      "idCliente": 502,
+      "nombreProyecto": "Lanzamiento App Móvil 'FitLife'",
+      "tipoProyecto": "Desarrollo App Móvil",
+      "estadoProyecto": "En Revisión",
+      "fechaInicioProyecto": "2024-05-15",
+      "fechaFinProyecto": "2024-11-30",
+      "presupuestoProyecto": 95000.5,
+      "prioridadProyecto": 4,
+      "descripcionProyecto": "Desarrollo completo (iOS y Android) de una aplicación de seguimiento de actividad física.",
+      "id": "0d8b"
+    },
+    {
+      "idProyecto": 3,
+      "idEquipo": 103,
+      "idCliente": 503,
+      "nombreProyecto": "Rediseño Web Corporativo",
+      "tipoProyecto": "Diseño UX/UI y Web",
+      "estadoProyecto": "Completado",
+      "fechaInicioProyecto": "2024-01-10",
+      "fechaFinProyecto": "2024-06-20",
+      "presupuestoProyecto": 45000,
+      "prioridadProyecto": 3,
+      "descripcionProyecto": "Actualización de la identidad visual y experiencia de usuario para el sitio web principal.",
+      "id": "0d1b"
+    },
+    {
+      "idProyecto": 4,
+      "idEquipo": 101,
+      "idCliente": 504,
+      "nombreProyecto": "Campaña de Marketing Digital Q4",
+      "tipoProyecto": "Marketing Digital",
+      "estadoProyecto": "Pendiente",
+      "fechaInicioProyecto": "2025-01-01",
+      "fechaFinProyecto": "2025-03-31",
+      "presupuestoProyecto": 30000,
+      "prioridadProyecto": 4,
+      "descripcionProyecto": "Planificación y ejecución de campañas SEM y redes sociales para la temporada de ventas de fin de año.",
+      "id": "0d10b"
+    },
+    {
+      "idProyecto": 5,
+      "idEquipo": 104,
+      "idCliente": 501,
+      "nombreProyecto": "Implementación de Módulo de Pagos",
+      "tipoProyecto": "Desarrollo Backend",
+      "estadoProyecto": "En Progreso",
+      "fechaInicioProyecto": "2024-10-20",
+      "fechaFinProyecto": "2025-01-15",
+      "presupuestoProyecto": 72500.75,
+      "prioridadProyecto": 5,
+      "descripcionProyecto": "Integración con pasarela de pagos externa y desarrollo del sistema de facturación automático.",
+      "id": "0d66b"
+    },
+    {
+      "idProyecto": 6,
+      "idEquipo": 105,
+      "idCliente": 505,
+      "nombreProyecto": "Auditoría de Seguridad de Datos",
+      "tipoProyecto": "Seguridad Informática",
+      "estadoProyecto": "En Progreso",
+      "fechaInicioProyecto": "2024-11-05",
+      "fechaFinProyecto": "2024-12-20",
+      "presupuestoProyecto": 20000,
+      "prioridadProyecto": 2,
+      "descripcionProyecto": "Revisión exhaustiva de vulnerabilidades en la base de datos y sistemas de autenticación.",
+      "id": "0d13b"
+    },
+    {
+      "idProyecto": 7,
+      "id": "0d6b",
+      "nombreProyecto": "GymAqua",
+      "responsable": "nejri",
+      "descripcion": "enrienrienen erere",
+      "tipoProyecto": "desarrollo",
+      "cliente": "clienteB",
+      "fechaInicio": "07/04/2025",
+      "fechaFin": "13/11/2025",
+      "presupuestoTotal": "7845"
+    }
+  ],
+  "cliente": [
+    {
+      "id": "1",
+      "dni": "45781248",
+      "nombreCliente": "Julio Cesar",
+      "direccionCliente": "Av. Mate de Luna 1578",
+      "TipoCliente": "Premiun",
+      "mailCliente": "juliocesar@gmail.com",
+      "telefonoCliente": "3815783692"
+    },
+    {
+      "id": "2",
+      "dni": "47812634",
+      "nombreCliente": "Julio Del Valle",
+      "direccionCliente": "Av. Mate de Luna 478",
+      "TipoCliente": "Premiun",
+      "mailCliente": "julioDV@gmail.com",
+      "telefonoCliente": "381781352"
+    }
+  ]
+}

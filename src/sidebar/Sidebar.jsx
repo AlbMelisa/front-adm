@@ -1,8 +1,8 @@
-import React from "react";
-import "./sidebar.css";
-import { Home, Folder, FileText } from "lucide-react";
+import { useState } from "react"; // 👈 Solo importamos el hook
+import { NavLink, Outlet, useLocation } from "react-router-dom"; 
 import Navbarcomponent from "../components/navbar/Navbarcomponent";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import "./sidebar.css";
+import { Home, Folder, FileText, Menu, X } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -26,7 +26,7 @@ export default function Sidebar() {
 
         <li
           className={
-            location.pathname === "/proyectslist"
+            location.pathname.includes("/proyectslist")
               ? "menu-item menu-selected"
               : "menu-item"
           }

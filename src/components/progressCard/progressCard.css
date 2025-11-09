@@ -1,0 +1,14 @@
+
+.progress-bar-custom,
+.progress-bar-custom .progress-bar {
+  border-radius: 0.25rem;
+}
+
+.progress-bar-custom {
+  height: 0.75rem; /* Le da el grosor de la imagen */
+  background-color: #e9ecef; /* Color de fondo de la barra */
+}
+
+.progress-bar.bg-dark {
+  background-color: #212529 !important; /* Color de la barra (negro) */
+}

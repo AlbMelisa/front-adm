@@ -9,6 +9,7 @@ import ProyectList from "./pages/proyectlist/ProyectList.jsx";
 import Proyect from "./pages/proyect/Proyect.jsx";
 import HomePage from "./pages/home/HomePage.jsx";
 import Sidebar from "./sidebar/Sidebar.jsx";
+import CreateProyect from "./pages/createProyect/createProyect.jsx";
 
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: '/proyectslist/proyect/:id',
         element: <Proyect/>
+      },
+      {
+        path: '/proyectslist/proyect/create',
+        element: <CreateProyect/>
       },
       {
         path: '/reports',

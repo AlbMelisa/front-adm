@@ -1,0 +1,63 @@
+/* Estilos para el color de los botones (el resto lo hace Bootstrap) */
+
+/* Contenedor principal para simular el look de la tarjeta del formulario */
+.form-card-custom {
+    max-width: 900px;
+}
+
+/* Título */
+.form-title-custom {
+    font-weight: 600;
+}
+
+/* Botón Crear Proyecto (Morado) */
+.create-btn-custom {
+    background-color: #7d44c9; /* Morado del ejemplo */
+    border-color: #7d44c9;
+    padding: 10px 25px; /* Ajuste de padding */
+    font-weight: 600;
+}
+
+.create-btn-custom:hover {
+    background-color: #6a3aae;
+    border-color: #6a3aae;
+}
+
+/* Botón Cancelar (Gris claro) */
+.cancel-btn-custom {
+    background-color: #f0f0f0 !important;
+    color: #555 !important;
+    border: 1px solid #ccc !important;
+    padding: 10px 25px; /* Ajuste de padding */
+    font-weight: 600;
+}
+
+.cancel-btn-custom:hover {
+    background-color: #e0e0e0 !important;
+}
+
+/* Estilos para el ícono del calendario dentro del input */
+.input-with-icon-bootstrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Mueve el ícono a la derecha del input */
+.calendar-icon-bootstrap {
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    color: #7d44c9;
+    pointer-events: none; /* No interfiere con el input */
+}
+.form-control:focus, 
+.form-select:focus,
+.input-group > .form-control:focus,
+.input-group > .form-select:focus {
+    /* Color principal de tu formulario (Morado) */
+    border-color: #7d44c9; 
+    /* Sombra de caja basada en el color principal */
+    box-shadow: 0 0 0 0.25rem rgba(125, 68, 201, 0.25); /* Color morado con 25% de opacidad */
+}
