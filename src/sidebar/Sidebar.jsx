@@ -2,7 +2,7 @@ import { useState } from "react"; // 👈 Solo importamos el hook
 import { NavLink, Outlet, useLocation } from "react-router-dom"; 
 import Navbarcomponent from "../components/navbar/Navbarcomponent";
 import "./sidebar.css";
-import { Home, Folder, FileText, Menu, X } from "lucide-react";
+import { Home, Folder, FileText, Menu, X, User } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -36,7 +36,19 @@ export default function Sidebar() {
             <span>Proyectos</span>
           </NavLink>
         </li>
+        <li
 
+          className={
+            location.pathname.includes("/customers")
+              ? "menu-item menu-selected"
+              : "menu-item"
+          }
+        >
+          <NavLink to="/customers" className="menu-link">
+            <User size={20} />
+            <span>Clientes</span>
+          </NavLink>
+        </li>
         <li
           className={
             location.pathname === "/reports"

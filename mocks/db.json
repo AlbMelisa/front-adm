@@ -13,7 +13,7 @@
       "presupuestoProyecto": 150000,
       "prioridadProyecto": 5,
       "descripcionProyecto": "Traslado de todos los microservicios a la nueva arquitectura de contenedores en AWS.",
-      "estado": "Terminado"
+      "estado": "En curso"
     },
     {
       "idProyecto": 2,
@@ -27,7 +27,8 @@
       "presupuestoProyecto": 95000.5,
       "prioridadProyecto": 4,
       "descripcionProyecto": "Desarrollo completo (iOS y Android) de una aplicación de seguimiento de actividad física.",
-      "id": "0d8b"
+      "id": "0d8b",
+      "estado": "Terminado"
     },
     {
       "idProyecto": 3,
@@ -41,7 +42,8 @@
       "presupuestoProyecto": 45000,
       "prioridadProyecto": 3,
       "descripcionProyecto": "Actualización de la identidad visual y experiencia de usuario para el sitio web principal.",
-      "id": "0d1b"
+      "id": "0d1b",
+      "estado": "Terminado"
     },
     {
       "idProyecto": 4,
@@ -55,7 +57,8 @@
       "presupuestoProyecto": 30000,
       "prioridadProyecto": 4,
       "descripcionProyecto": "Planificación y ejecución de campañas SEM y redes sociales para la temporada de ventas de fin de año.",
-      "id": "0d10b"
+      "id": "0d10b",
+      "estado": "Terminado"
     },
     {
       "idProyecto": 5,

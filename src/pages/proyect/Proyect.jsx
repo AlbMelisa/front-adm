@@ -1,15 +1,24 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import StatCard from "../../components/statCard/StatCard";
-import { GraphUp, CheckCircleFill, ClockHistory, PauseCircle } from 'react-bootstrap-icons';import { Container } from "react-bootstrap";
+import {
+  GraphUp,
+  CheckCircleFill,
+  ClockHistory,
+  PauseCircle,
+} from "react-bootstrap-icons";
+import { Button, Container } from "react-bootstrap";
 import ProgressCard from "../../components/progressCard/ProgressCard";
 import { useState } from "react";
 import ResourceCard from "../../components/resourceCard/ResourceCard";
 import ProgressByFeatureCard from "../../components/progressByFeatureCard/ProgressByFeatureCard";
 import { useParams } from "react-router-dom";
+import Feature from "../../components/feature/Feature";
+import { BsPencil, BsTrash, BsPlusLg } from "react-icons/bs";
 
 const Proyect = () => {
   const { idProyecto } = useParams();
+  const [showModal, setShowModal] = useState(false);
 
   const [tasks, setTasks] = useState([
     { id: 1, completed: true },
@@ -18,27 +27,47 @@ const Proyect = () => {
   ]);
 
   const featureData = [
-    { id: 'f1', name: 'Sistema de Autenticacion', completed: 1, total: 2 },
-    { id: 'f2', name: 'Cargar Datos', completed: 1, total: 1 }
+    { id: "f1", name: "Sistema de Autenticacion", completed: 1, total: 2 },
+    { id: "f2", name: "Cargar Datos", completed: 1, total: 1 },
   ];
   const resourceData = {
     total: 3,
     humanos: 3,
     materiales: 0,
     tecnologicos: 2,
-    financieros: 0
+    financieros: 0,
+  };
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  const handleAddFeature = (newFeature) => {
+    setFeatures([
+      ...features,
+      {
+        ...newFeature,
+        id: features.length + 1,
+        tareas: [],
+        incidencias: [],
+      },
+    ]);
+    handleCloseModal();
   };
 
   const totalTasks = tasks.length; // 3
-  const completedTasks = tasks.filter(task => task.completed).length; // 2
+  const completedTasks = tasks.filter((task) => task.completed).length; // 2
   const inProgressTasks = 0; // Lógica para calcular esto...
-  const pendingTasks = 1;    // Lógica para calcular esto...
-  
+  const pendingTasks = 1; // Lógica para calcular esto...
+
   return (
     <Container fluid className="p-4">
-      <Row >
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="dashboard-title">Gestión de Funcionalidades</h2>
+        {/* <Button className="btn-add-feature" onClick={handleShowModal}>
+          <BsPlusLg /> Nueva Funcionalidad
+        </Button> */}
+      </div>
+      <Row>
         <Col>
-         <ProgressCard
+          <ProgressCard
             title="Progreso General"
             icon={<GraphUp />}
             completed={completedTasks}
@@ -76,12 +105,23 @@ const Proyect = () => {
       </Row>
       <Row>
         <Col>
-          <ResourceCard resources={resourceData}/>
+          <ResourceCard resources={resourceData} />
         </Col>
         <Col>
-          <ProgressByFeatureCard features={featureData}/>
+          <ProgressByFeatureCard features={featureData} />
         </Col>
       </Row>
+      <Row>
+        <Col>
+          <Feature />
+        </Col>
+      </Row>
+          {/* <AddFeatureModal
+        type={"Funcionalidad"}
+        show={showModal}
+        onHide={handleCloseModal}
+        onAdd={handleAddFeature}
+      />  */}
     </Container>
   );
 };

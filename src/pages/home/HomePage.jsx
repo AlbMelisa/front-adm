@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import "./home.css";
-import { Folder, FileText, Home } from "lucide-react";
+import { Folder, FileText, Home, User } from "lucide-react";
 
 const HomePage = () => {
   return (
@@ -16,6 +16,12 @@ const HomePage = () => {
           <Folder className="card-icon" size={36} />
           <h2>Proyectos</h2>
           <p>Gestiona y visualiza todos tus proyectos</p>
+        </NavLink>
+
+        <NavLink to="/customers" className="card">
+          <User className="card-icon" size={36} />
+          <h2>Clientes</h2>
+          <p>Consulta proyectos del cliente</p>
         </NavLink>
 
         <NavLink to="/reports" className="card">

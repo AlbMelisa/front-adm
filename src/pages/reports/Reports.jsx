@@ -90,18 +90,7 @@ const Reports = () => {
       </div>
 
       {/* 🔹 Gráfico de actividad */}
-      <div className="reports-activity">
-        <h2>Resumen de Actividad</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={activityData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="mes" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="horas" fill="#a855f7" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      
     </div>
   )
 }
