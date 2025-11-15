@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Button,
@@ -11,39 +11,70 @@ import {
   Badge,
 } from "react-bootstrap";
 
+// --- (Mocks y Mapas de Prioridad no cambian) ---
 const mockResponsables = [
   "Juan Pérez",
   "María González",
   "Carlos Sánchez",
   "Ana López",
 ];
-
 const mockRecursos = [
   "Diseñador UI/UX",
   "Desarrollador Backend",
   "Licencia Software",
   "Servidor de Pruebas",
 ];
+const priorityMapToApi = { Baja: 0, Media: 1, Alta: 2, Crítica: 3 };
+const priorityMapFromApi = { 0: "Baja", 1: "Media", 2: "Alta", 3: "Crítica" };
 
-const priorityMap = {
-  Baja: 0,
-  Media: 1,
-  Alta: 2,
-  Crítica: 3,
-};
+/**
+ * Modal para CREAR o EDITAR una tarea.
+ */
+const CreateTaskModal = ({ show, onHide, idFunction, taskData }) => {
+  const isEditMode = !!taskData;
 
-const CreateTaskModal = ({show, onHide, idFunction}) => {
+  // --- Estados del Formulario ---
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [responsable, setResponsable] = useState(mockResponsables[0]); // Campo de UI
+  const [responsable, setResponsable] = useState(mockResponsables[0]);
   const [dateEnd, setDateEnd] = useState("");
-  const [priority, setPriority] = useState("Media"); // Valor string de la UI
+  const [priority, setPriority] = useState("Media");
+  
+  // ✅ 1. Nuevo estado para el "Estado de la Tarea"
+  const [estado, setEstado] = useState("Pendiente"); 
 
   const [recursosAsignados, setRecursosAsignados] = useState([]);
-  const [recursoSeleccionado, setRecursoSeleccionado] = useState(
-    mockRecursos[0]
-  );
+  const [recursoSeleccionado, setRecursoSeleccionado] = useState(mockRecursos[0]);
 
+  /**
+   * ✅ 3. useEffect actualizado
+   * Rellena el formulario cuando se abre en modo Edición
+   */
+  useEffect(() => {
+    if (show) {
+      if (isEditMode && taskData) {
+        // --- MODO EDICIÓN ---
+        setTaskName(taskData.nombre || "");
+        setTaskDescription(taskData.descripcion || "");
+        setDateEnd(taskData.dateEnd || "");
+        setPriority(priorityMapFromApi[taskData.prioridad] || "Media");
+        setResponsable(taskData.responsable || mockResponsables[0]);
+        setRecursosAsignados(taskData.recursos || []);
+        
+        // Setea el estado
+        setEstado(taskData.estado || "Pendiente");
+
+      } else {
+        // --- MODO CREACIÓN ---
+        resetForm();
+      }
+    }
+  }, [show, taskData, isEditMode]);
+
+  /**
+   * ✅ 4. resetForm actualizado
+   * Limpia el formulario y establece valores por defecto
+   */
   const resetForm = () => {
     setTaskName("");
     setTaskDescription("");
@@ -52,64 +83,62 @@ const CreateTaskModal = ({show, onHide, idFunction}) => {
     setPriority("Media");
     setRecursosAsignados([]);
     setRecursoSeleccionado(mockRecursos[0]);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const payload = {
-      idFunction: idFunction,
-      taskName: taskName,
-      taskDescription: taskDescription,
-      priority: priorityMap[priority],
-      dateEnd: dateEnd,
-    };
-
-    console.log("Enviando Payload a la API:", payload);
-
-    try {
-      // --- Lógica de API ---
-      // const response = await fetch("URL_DE_TU_API/tasks", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(payload),
-      // });
-      //
-      // if (!response.ok) {
-      //   throw new Error("Error al crear la tarea");
-      // }
-
-      // const newTask = await response.json();
-      // console.log("Tarea creada:", newTask);
-      // ---------------------
-
-      // Si la API fue exitosa, cierra y resetea
-      handleCloseAndReset();
-    } catch (error) {
-      console.error("Error en handleSubmit:", error);
-      // Aquí podrías mostrar una alerta de error
-    }
+    
+    // Resetea el estado
+    setEstado("Pendiente"); 
   };
 
   /**
-   * Agrega un recurso a la lista (solo UI).
+   * ✅ 5. handleSubmit actualizado
+   * Envía TODOS los campos del formulario a la API
    */
-  const handleAddRecurso = () => {
-    if (
-      recursoSeleccionado &&
-      !recursosAsignados.includes(recursoSeleccionado)
-    ) {
-      setRecursosAsignados([...recursosAsignados, recursoSeleccionado]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Ahora el payload incluye todos los campos del formulario
+    const payload = {
+      taskName: taskName,
+      taskDescription: taskDescription,
+      priority: priorityMapToApi[priority],
+      dateEnd: dateEnd,
+      estado: estado,                   // <-- AÑADIDO
+      responsable: responsable,         // <-- AÑADIDO
+      recursos: recursosAsignados,    // <-- AÑADIDO
+    };
+
+    try {
+      if (isEditMode) {
+        // --- LÓGICA DE EDICIÓN (PUT / PATCH) ---
+        console.log(`Enviando Payload (PATCH) a /tasks/${taskData.id}:`, payload);
+        // ... (Tu fetch 'PATCH' aquí) ...
+
+      } else {
+        // --- LÓGICA DE CREACIÓN (POST) ---
+        const createPayload = { ...payload, idFunction: idFunction };
+        console.log("Enviando Payload (POST) a /tasks:", createPayload);
+        // ... (Tu fetch 'POST' aquí) ...
+      }
+
+      handleCloseAndReset();
+
+    } catch (error) {
+      console.error("Error en handleSubmit:", error);
     }
   };
 
+  // ... (handleAddRecurso y handleRemoveRecurso no cambian) ...
+
+  const handleAddRecurso = () => {
+    if (recursoSeleccionado && !recursosAsignados.includes(recursoSeleccionado)) {
+      setRecursosAsignados([...recursosAsignados, recursoSeleccionado]);
+    }
+  };
   
   const handleRemoveRecurso = (recursoARemover) => {
     setRecursosAsignados(
       recursosAsignados.filter((r) => r !== recursoARemover)
     );
   };
-
 
   const handleCloseAndReset = () => {
     resetForm();
@@ -119,41 +148,39 @@ const CreateTaskModal = ({show, onHide, idFunction}) => {
   return (
     <Modal show={show} onHide={handleCloseAndReset} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Crear Nueva Tarea</Modal.Title>
+        <Modal.Title>
+          {isEditMode ? "Modificar Tarea" : "Crear Nueva Tarea"}
+        </Modal.Title>
       </Modal.Header>
 
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
-          <p className="text-muted">
-            Complete todos los campos para crear una nueva tarea
-          </p>
-
+          {/* ... (Nombre y Descripción no cambian) ... */}
           <Form.Group className="mb-3">
-            <Form.Label>
-              Nombre de la Tarea <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Ej: Implementar sistema de autenticación"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>
-              Descripción <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Describe los detalles y objetivos de la tarea..."
-              value={taskDescription}
-              onChange={(e) => setTaskDescription(e.target.value)}
-              required
-            />
-          </Form.Group>
+             <Form.Label>
+               Nombre de la Tarea <span className="text-danger">*</span>
+             </Form.Label>
+             <Form.Control
+               type="text"
+               placeholder="Ej: Implementar sistema de autenticación"
+               value={taskName}
+               onChange={(e) => setTaskName(e.target.value)}
+               required
+             />
+           </Form.Group>
+           <Form.Group className="mb-3">
+             <Form.Label>
+               Descripción <span className="text-danger">*</span>
+             </Form.Label>
+             <Form.Control
+               as="textarea"
+               rows={3}
+               placeholder="Describe los detalles y objetivos de la tarea..."
+               value={taskDescription}
+               onChange={(e) => setTaskDescription(e.target.value)}
+               required
+             />
+           </Form.Group>
 
           <Row className="mb-3">
             <Col md={6}>
@@ -167,9 +194,7 @@ const CreateTaskModal = ({show, onHide, idFunction}) => {
                   required
                 >
                   {mockResponsables.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
+                    <option key={r} value={r}>{r}</option>
                   ))}
                 </Form.Select>
               </Form.Group>
@@ -177,8 +202,7 @@ const CreateTaskModal = ({show, onHide, idFunction}) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label>
-                  Fecha de Finalización Estimada{" "}
-                  <span className="text-danger">*</span>
+                  Fecha de Finalización Estimada <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
                   type="date"
@@ -190,91 +214,92 @@ const CreateTaskModal = ({show, onHide, idFunction}) => {
             </Col>
           </Row>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Prioridad</Form.Label>
-            {/* ToggleButtonGroup maneja el estado "activo" automáticamente */}
-            <ToggleButtonGroup
-              type="radio"
-              name="priority"
-              value={priority}
-              onChange={setPriority}
-              className="w-100 d-flex gap-2"
-            >
-              <ToggleButton id="p-baja" value="Baja" variant="outline-success">
-                Baja
-              </ToggleButton>
-              <ToggleButton
-                id="p-media"
-                value="Media"
-                variant="outline-primary"
-              >
-                Media
-              </ToggleButton>
-              <ToggleButton id="p-alta" value="Alta" variant="outline-warning">
-                Alta
-              </ToggleButton>
-              <ToggleButton
-                id="p-critica"
-                value="Crítica"
-                variant="outline-danger"
-              >
-                Crítica
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Form.Group>
+          <Row className="mb-3">
+            <Col md={6}>
+              {/* ✅ 2. Campo de Formulario para el Estado */}
+              <Form.Group>
+                <Form.Label>Estado <span className="text-danger">*</span></Form.Label>
+                <Form.Select
+                  value={estado}
+                  onChange={(e) => setEstado(e.target.value)}
+                  required
+                >
+                  {/* Deshabilita "Completada" si es una tarea nueva
+                      (opcional, pero buena práctica) */}
+                  {!isEditMode && (
+                    <option value="Pendiente">Pendiente</option>
+                  )}
+                  {isEditMode && (
+                    <>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="En Progreso">En Progreso</option>
+                      <option value="Completada">Completada</option>
+                    </>
+                  )}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+               <Form.Group>
+                 <Form.Label>Prioridad</Form.Label>
+                 <ToggleButtonGroup
+                   type="radio"
+                   name="priority"
+                   value={priority}
+                   onChange={setPriority}
+                   className="w-100 d-flex gap-2"
+                 >
+                   <ToggleButton id="p-baja" value="Baja" variant="outline-success">Baja</ToggleButton>
+                   <ToggleButton id="p-media" value="Media" variant="outline-primary">Media</ToggleButton>
+                   <ToggleButton id="p-alta" value="Alta" variant="outline-warning">Alta</ToggleButton>
+                   <ToggleButton id="p-critica" value="Crítica" variant="outline-danger">Crítica</ToggleButton>
+                 </ToggleButtonGroup>
+               </Form.Group>
+            </Col>
+          </Row>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Recursos Necesarios</Form.Label>
-            <InputGroup>
-              <Form.Select
-                value={recursoSeleccionado}
-                onChange={(e) => setRecursoSeleccionado(e.target.value)}
-              >
-                {mockRecursos.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </Form.Select>
-              <Button variant="dark" onClick={handleAddRecurso}>
-                Agregar
-              </Button>
-            </InputGroup>
+          {/* ... (Recursos Necesarios no cambia) ... */}
+           <Form.Group className="mb-3">
+             <Form.Label>Recursos Necesarios</Form.Label>
+             <InputGroup>
+               <Form.Select
+                 value={recursoSeleccionado}
+                 onChange={(e) => setRecursoSeleccionado(e.target.value)}
+               >
+                 {mockRecursos.map((r) => (
+                   <option key={r} value={r}>{r}</option>
+                 ))}
+               </Form.Select>
+               <Button variant="dark" onClick={handleAddRecurso}>
+                 Agregar
+               </Button>
+             </InputGroup>
+             <div className="mt-2 p-2 border rounded" style={{ minHeight: "50px" }}>
+               {recursosAsignados.length === 0 ? (
+                 <p className="text-muted small mb-0">No hay recursos asignados.</p>
+               ) : (
+                 <div>
+                   {recursosAsignados.map((r) => (
+                     <Badge
+                       key={r} pill bg="secondary" className="me-2 p-2"
+                       onClick={() => handleRemoveRecurso(r)}
+                       style={{ cursor: "pointer" }}
+                     >
+                       {r} &times;
+                     </Badge>
+                   ))}
+                 </div>
+               )}
+             </div>
+           </Form.Group>
 
-            <div
-              className="mt-2 p-2 border rounded"
-              style={{ minHeight: "50px" }}
-            >
-              {recursosAsignados.length === 0 ? (
-                <p className="text-muted small mb-0">
-                  No hay recursos asignados. Selecciona recursos del menú
-                  superior.
-                </p>
-              ) : (
-                <div>
-                  {recursosAsignados.map((r) => (
-                    <Badge
-                      key={r}
-                      pill
-                      bg="secondary"
-                      className="me-2 p-2"
-                      onClick={() => handleRemoveRecurso(r)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {r} &times;
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="light" onClick={handleCloseAndReset}>
             Cancelar
           </Button>
           <Button variant="dark" type="submit">
-            Crear Tarea
+            {isEditMode ? "Guardar Cambios" : "Crear Tarea"}
           </Button>
         </Modal.Footer>
       </Form>

@@ -12,7 +12,8 @@ import {
 import { BsPencil, BsTrash, BsPlusLg } from "react-icons/bs";
 import "../feature/features.css";
 import CreateTaskModal from "../createTaskModal/CreateTaskModal";
-// Componente para el color del badge de tipo de incidencia
+import IncidentModal from "../incidentModal/IncidentModal";
+
 const getBadgeBg = (tipo) => {
   switch (tipo) {
     case "Humano":
@@ -26,7 +27,6 @@ const getBadgeBg = (tipo) => {
   }
 };
 
-// Componente para el color del badge de estado de tarea
 const getStatusBadge = (estado) => {
   switch (estado) {
     case "Completada":
@@ -92,19 +92,20 @@ const FeatureAccordion = ({ feature, eventKey }) => {
             variant="outline-primary"
             size="sm"
             onClick={() => {
-              setSelectedFeature(feature); // 🚀 guardamos la funcionalidad
-              setShowModalTwo(true); // abrimos modal
+              setSelectedFeature(feature); // Guardas la 'feature' para el idFunction
+    setSelectedTask(null); // ✅ Asegúrate de poner la tarea seleccionada en NULL
+    setShowModalTwo(true); // Abre el modal
             }}
           >
             <BsPlusLg /> Agregar Tarea
           </Button>
         </div>
-        <CreateTaskModal
+        {/* <CreateTaskModal
           type="Tareas"
           show={showModalTwo}
           onHide={() => setShowModalTwo(false)}
           data={selectedTask}
-        />
+        /> */}
         <ListGroup variant="flush">
           {tareas.length > 0 ? (
             tareas.map((task) => (
@@ -121,8 +122,8 @@ const FeatureAccordion = ({ feature, eventKey }) => {
                       variant="link"
                       size="sm"
                       onClick={() => {
-                        setSelectedTask(task); // 🚀 guardamos la funcionalidad
-                        setShowModalTask(true); // abrimos modal
+                        setSelectedTask(task); // ✅ Guardas la TAREA COMPLETA
+    setShowModalTwo(true);
                       }}
                     >
                       <BsPencil />
@@ -132,12 +133,12 @@ const FeatureAccordion = ({ feature, eventKey }) => {
                     </Button>
                   </div>
                 </div>
-                {/* <AddFeatureModal
+                {/* <CreateTaskModal
                   type="Tarea"
                   show={showModalTask}
                   onHide={() => setShowModalTask(false)}
                   data={selectedTask}
-                /> */}
+                />  */}
                 <small className="text-muted">{task.descripcion}</small>
               </ListGroup.Item>
             ))
@@ -159,12 +160,11 @@ const FeatureAccordion = ({ feature, eventKey }) => {
             <BsPlusLg /> Agregar Incidencia
           </Button>
         </div>
-        {/* <AddFeatureModal
-          type="Incidencia"
-          show={showModalThree}
-          onHide={() => setShowModalThree(false)}
-          data={selectedFeature}
-        /> */}
+        <IncidentModal
+        show={showModalThree}
+        onHide={()=> setShowModalThree(false)}
+        />
+        
         <Row className="mb-4">
           {incidencias.length > 0 ? (
             incidencias.map((inc) => (
@@ -210,6 +210,16 @@ const FeatureAccordion = ({ feature, eventKey }) => {
           )}
         </Row>
       </Accordion.Body>
+<CreateTaskModal
+  show={showModalTwo}
+  onHide={() => setShowModalTwo(false)}
+  
+  // Lógica condicional corregida:
+  // Si selectedTask existe (modo edición), no pasamos idFunction.
+  // Si selectedTask es null (modo creación), pasamos el id de la feature.
+  idFunction={selectedTask ? null : selectedFeature?.id}
+  taskData={selectedTask} // Esto está perfecto
+/>
     </Accordion.Item>
   );
 };
