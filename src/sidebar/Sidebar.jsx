@@ -26,12 +26,12 @@ export default function Sidebar() {
 
         <li
           className={
-            location.pathname.includes("/proyectslist")
+            location.pathname.includes("/projectslist")
               ? "menu-item menu-selected"
               : "menu-item"
           }
         >
-          <NavLink to="/proyectslist" className="menu-link">
+          <NavLink to="/projectslist" className="menu-link">
             <Folder size={20} />
             <span>Proyectos</span>
           </NavLink>
@@ -62,22 +62,6 @@ export default function Sidebar() {
           </NavLink>
         </li>
       </ul>
-          {/* <div className="menu">
-            <div className="menu-item active">
-              <Home size={20} />
-              <span>Inicio</span>
-            </div>
-
-            <div className="menu-item">
-              <Folder size={20} />
-              <span>Proyectos</span>
-            </div>
-
-            <div className="menu-item">
-              <FileText size={20} />
-              <span>Reportes</span>
-            </div>
-          </div> */}
 
         </nav>
       </div>

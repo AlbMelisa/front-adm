@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import ListProyects from "../../components/list/ListProyects";
+import ListProyects from "../../components/list/ListProjects";
 import { Button, Container } from "react-bootstrap";
 import ProyectStatus from "../../components/proyectStatus/ProyectStatus";
 import { useNavigate } from "react-router-dom";
+import ListProjects from "../../components/list/ListProjects";
 
-const ProyectList = () => {
+const ProjectList = () => {
   const navigate = useNavigate();
   const [proyectos, setProyectos] = useState([]);
 
-  const endpoint = "http://localhost:3001/proyectos";
+  const endpoint = "http://localhost:3001/Projects";
 
   useEffect(() => {
     const fetchProyectos = async () => {
@@ -33,20 +34,20 @@ const ProyectList = () => {
         <h4 className="mb-3">Proyectos Registrados</h4>
         <Button
           variant="secondary"
-          onClick={() => navigate(`/proyectslist/proyect/create`)}
+          onClick={() => navigate(`/projectslist/project/create`)}
         >
           Nuevo Proyecto
         </Button>
       </div>
 
-      {/* Gráfico de estado de proyectos */}
+      {/* Gráfico de estado de proyectos 
       <ProyectStatus Proyect={proyectos} />
 
       {/* Lista de proyectos */}
-      <ListProyects  />
+      <ListProjects  />
     </Container>
   );
 };
 
 
-export default ProyectList
+export default ProjectList

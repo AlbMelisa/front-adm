@@ -1,124 +1,270 @@
 {
-  "proyectos": [
+  "Projects": [
     {
-      "id": "0d7b",
-      "idProyecto": 1,
-      "idEquipo": 101,
-      "idCliente": 501,
-      "nombreProyecto": "Migración a la Nube V3",
-      "tipoProyecto": "Infraestructura Cloud",
-      "estadoProyecto": "En Progreso",
-      "fechaInicioProyecto": "2024-09-01",
-      "fechaFinProyecto": "2025-03-31",
-      "presupuestoProyecto": 150000,
-      "prioridadProyecto": 5,
-      "descripcionProyecto": "Traslado de todos los microservicios a la nueva arquitectura de contenedores en AWS.",
-      "estado": "En curso"
+      "idProject": 5,
+      "nameProject": "GymAfg",
+      "typeProject": "Escritorio",
+      "dataInitial": "2025-11-12T04:07:23.5393482",
+      "dateEnd": "0001-01-01",
+      "priorityProject": "High",
+      "stateProject": "In_Progress",
+      "budgetProject": 3000000,
+      "descriptionProject": "Sistema de gestión de gimnasios que permita gestionar los empleados, mediante la alta, baja y modificación. Que permita gestionar los clientes con sus correspondientes membresías y que el ingreso se realice mediante la comunicacion con un sensor de huella digital.",
+      "clientName": "Milagros Albornoz",
+      "teamNumber": 101,
+      "functions": [
+        {
+          "functionName": "Gestion de empleados",
+          "functionDescription": "Debe permitir dar de alta, baja y modificar los diferentes empleados del sistema."
+        },
+        {
+          "functionName": "Gestion de Clientes",
+          "functionDescription": "Debe permitir registrar nuevos clientes en el sistema y poder gestionar su membresía correspondiente."
+        },
+        {
+          "functionName": "Integracion con sensor",
+          "functionDescription": "Debe poder comunicarse y controlar el ingreso de los clientes mediante la huella digital registrada por el mismo."
+        }
+      ],
+      "id": "fd66"
     },
     {
-      "idProyecto": 2,
-      "idEquipo": 102,
-      "idCliente": 502,
-      "nombreProyecto": "Lanzamiento App Móvil 'FitLife'",
-      "tipoProyecto": "Desarrollo App Móvil",
-      "estadoProyecto": "En Revisión",
-      "fechaInicioProyecto": "2024-05-15",
-      "fechaFinProyecto": "2024-11-30",
-      "presupuestoProyecto": 95000.5,
-      "prioridadProyecto": 4,
-      "descripcionProyecto": "Desarrollo completo (iOS y Android) de una aplicación de seguimiento de actividad física.",
-      "id": "0d8b",
-      "estado": "Terminado"
+      "idProject": 6,
+      "nameProject": "GymCol",
+      "typeProject": "Escritorio",
+      "dataInitial": "2025-11-12T04:07:23.5393482",
+      "dateEnd": "2025-01-01",
+      "priorityProject": "High",
+      "stateProject": "In_Progress",
+      "budgetProject": 3000000,
+      "descriptionProject": "Sistema de gestión de gimnasios que permita gestionar los empleados, mediante la alta, baja y modificación. Que permita gestionar los clientes con sus correspondientes membresías y que el ingreso se realice mediante la comunicacion con un sensor de huella digital.",
+      "clientName": "Lionel Messi",
+      "teamNumber": 15,
+      "functions": [
+        {
+          "functionName": "Gestion de empleados",
+          "functionDescription": "Debe permitir dar de alta, baja y modificar los diferentes empleados del sistema."
+        },
+        {
+          "functionName": "Integracion con sensor",
+          "functionDescription": "Debe poder comunicarse y controlar el ingreso de los clientes mediante la huella digital registrada por el mismo."
+        }
+      ],
+      "id": "b38b"
     },
     {
-      "idProyecto": 3,
-      "idEquipo": 103,
-      "idCliente": 503,
-      "nombreProyecto": "Rediseño Web Corporativo",
-      "tipoProyecto": "Diseño UX/UI y Web",
-      "estadoProyecto": "Completado",
-      "fechaInicioProyecto": "2024-01-10",
-      "fechaFinProyecto": "2024-06-20",
-      "presupuestoProyecto": 45000,
-      "prioridadProyecto": 3,
-      "descripcionProyecto": "Actualización de la identidad visual y experiencia de usuario para el sitio web principal.",
-      "id": "0d1b",
-      "estado": "Terminado"
+      "idProject": 8032,
+      "nameProject": "mmm",
+      "teamNumber": "2",
+      "descriptionProject": "mmm",
+      "clientName": "1",
+      "typeProject": "Escritorio",
+      "priorityProject": "2",
+      "stateProject": "In_Progress",
+      "dataEnd": "2026-05-22T00:00:00",
+      "budgetProject": "254",
+      "functions": [
+        {
+          "functionName": "mmm",
+          "functionDescription": "mmm"
+        }
+      ]
     },
     {
-      "idProyecto": 4,
-      "idEquipo": 101,
-      "idCliente": 504,
-      "nombreProyecto": "Campaña de Marketing Digital Q4",
-      "tipoProyecto": "Marketing Digital",
-      "estadoProyecto": "Pendiente",
-      "fechaInicioProyecto": "2025-01-01",
-      "fechaFinProyecto": "2025-03-31",
-      "presupuestoProyecto": 30000,
-      "prioridadProyecto": 4,
-      "descripcionProyecto": "Planificación y ejecución de campañas SEM y redes sociales para la temporada de ventas de fin de año.",
-      "id": "0d10b",
-      "estado": "Terminado"
-    },
-    {
-      "idProyecto": 5,
-      "idEquipo": 104,
-      "idCliente": 501,
-      "nombreProyecto": "Implementación de Módulo de Pagos",
-      "tipoProyecto": "Desarrollo Backend",
-      "estadoProyecto": "En Progreso",
-      "fechaInicioProyecto": "2024-10-20",
-      "fechaFinProyecto": "2025-01-15",
-      "presupuestoProyecto": 72500.75,
-      "prioridadProyecto": 5,
-      "descripcionProyecto": "Integración con pasarela de pagos externa y desarrollo del sistema de facturación automático.",
-      "id": "0d66b"
-    },
-    {
-      "idProyecto": 6,
-      "idEquipo": 105,
-      "idCliente": 505,
-      "nombreProyecto": "Auditoría de Seguridad de Datos",
-      "tipoProyecto": "Seguridad Informática",
-      "estadoProyecto": "En Progreso",
-      "fechaInicioProyecto": "2024-11-05",
-      "fechaFinProyecto": "2024-12-20",
-      "presupuestoProyecto": 20000,
-      "prioridadProyecto": 2,
-      "descripcionProyecto": "Revisión exhaustiva de vulnerabilidades en la base de datos y sistemas de autenticación.",
-      "id": "0d13b"
-    },
-    {
-      "idProyecto": 7,
-      "id": "0d6b",
-      "nombreProyecto": "GymAqua",
-      "responsable": "nejri",
-      "descripcion": "enrienrienen erere",
-      "tipoProyecto": "desarrollo",
-      "cliente": "clienteB",
-      "fechaInicio": "07/04/2025",
-      "fechaFin": "13/11/2025",
-      "presupuestoTotal": "7845"
+      "idProject": 4928,
+      "nameProject": "pop",
+      "teamNumber": "2",
+      "descriptionProject": "ejnrienriei",
+      "stateProject": "In_Progress",
+      "clientName": "2",
+      "typeProject": "Mobile",
+      "priorityProject": "0",
+      "dataEnd": "2025-12-20T00:00:00",
+      "budgetProject": "117",
+      "functions": [
+        {
+          "functionName": "kmienie",
+          "functionDescription": "eerere"
+        }
+      ]
     }
   ],
-  "cliente": [
+  "clientsRegistered": [
     {
-      "id": "1",
-      "dni": "45781248",
-      "nombreCliente": "Julio Cesar",
-      "direccionCliente": "Av. Mate de Luna 1578",
-      "TipoCliente": "Premiun",
-      "mailCliente": "juliocesar@gmail.com",
-      "telefonoCliente": "3815783692"
+      "fullNameClient": "Milagros Albornoz",
+      "dniClient": 46652333,
+      "directionClient": "Lopez 123",
+      "mailClient": "lucias@gmail.com",
+      "phoneClient": "381215102"
     },
     {
-      "id": "2",
-      "dni": "47812634",
-      "nombreCliente": "Julio Del Valle",
-      "direccionCliente": "Av. Mate de Luna 478",
-      "TipoCliente": "Premiun",
-      "mailCliente": "julioDV@gmail.com",
-      "telefonoCliente": "381781352"
+      "fullNameClient": "Melisa Berrondo",
+      "dniClient": 42989748,
+      "directionClient": "Tafi Viejo",
+      "mailClient": "melisab@gmail.com",
+      "phoneClient": "381200369"
+    },
+    {
+      "fullNameClient": "Agustin Marchesin",
+      "dniClient": 38784522,
+      "directionClient": "La boca",
+      "mailClient": "marche@gmail.com",
+      "phoneClient": "387411032"
+    },
+    {
+      "fullNameClient": "Fernando Gago",
+      "dniClient": 42988748,
+      "directionClient": "Lazaro 45",
+      "mailClient": "gago@gmail.com",
+      "phoneClient": "386598620"
+    }
+  ],
+  "teamsRegistered": [
+    {
+      "numberTeam": 101,
+      "employees": [
+        {
+          "nameEmployee": "Leandro",
+          "lastNameEmployee": "Paredes",
+          "dniEmployee": 44128755,
+          "rolEmployee": "ProjectManager"
+        },
+        {
+          "nameEmployee": "Lucia",
+          "lastNameEmployee": "Silvia",
+          "dniEmployee": 41548966,
+          "rolEmployee": "Tester"
+        },
+        {
+          "nameEmployee": "Miguel",
+          "lastNameEmployee": "Merentiel",
+          "dniEmployee": 45548144,
+          "rolEmployee": "Developer"
+        }
+      ]
+    },
+    {
+      "numberTeam": 107,
+      "employees": []
+    }
+  ],
+  "ProjectsgetById6": [
+    {
+      "proyect": {
+        "idProject": 6,
+        "nameProject": "ColosseoGym",
+        "typeProject": "Escritorio",
+        "dateInitial": "2025-11-15T00:50:36.6352983",
+        "dateEnd": "2025-11-25",
+        "priorityProject": "Medium",
+        "stateProject": "In_Progress",
+        "budgetProject": 300000,
+        "descriptionProject": "Sistema de gestión de gimnasios que permita gestionar los empleados, mediante la alta y baja. Que permita gestionar los clientes y la administración con el proveedor de suplementos y bebidas.",
+        "client": {
+          "fullNameClient": "Agustin Marchesin",
+          "dniClient": 38784522,
+          "directionClient": "La boca",
+          "mailClient": "marche@gmail.com",
+          "phoneClient": "387411032"
+        },
+        "team": {
+          "numberTeam": 107,
+          "employees": []
+        },
+        "incidencesList": [
+          {
+            "typeIncidence": "Recursos",
+            "descriptionIncidence": "Licencia presentada por un admin."
+          }
+        ],
+        "functions": [
+          {
+            "functionName": "Gestion de empleados",
+            "functionDescription": "Debe permitir dar de alta, baja y modificar los diferentes empleados del sistema.",
+            "tasks": [
+              {
+                "idTask": 9,
+                "taskName": "Módulo Administracion",
+                "taskDescription": "Alta y baja de adm",
+                "taskPriority": 0,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "In_Progress",
+                "taskState": "In_Progress"
+              },
+              {
+                "idTask": 19,
+                "taskName": "Módulo Administracion",
+                "taskDescription": "Alta y baja de adm",
+                "taskPriority": 0,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "Completed",
+                "taskState": "Completed"
+              }
+            ]
+          },
+          {
+            "functionName": "Gestion de Clientes",
+            "functionDescription": "Debe permitir registrar nuevos clientes en el sistema y poder gestionar su membresía correspondiente.",
+            "tasks": [
+              {
+                "idTask": 23,
+                "taskName": "Módulo clientes",
+                "taskDescription": "Alta y baja de clientes",
+                "taskPriority": 0,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "In_Progress",
+                "taskState": "In_Progress"
+              },
+              {
+                "idTask": 39,
+                "taskName": "Módulo Administracion",
+                "taskDescription": "Alta y baja de adm",
+                "taskPriority": 0,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "Completed",
+                "taskState": "Completed"
+              },
+              {
+                "idTask": 89,
+                "taskName": "Módulo Administracion",
+                "taskDescription": "Alta y baja de adm",
+                "taskPriority": 0,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "In_Progress",
+                "taskState": "In_Progress"
+              }
+            ]
+          },
+          {
+            "functionName": "Administracion proveedor",
+            "functionDescription": "Debe poder gestionar una comunicacion con el proveedor para solicitar los productos necesarios de suplementación.",
+            "tasks": [
+              {
+                "idTask": 5,
+                "taskName": "Módulo Usuario",
+                "taskDescription": "Alta y baja de usuarios",
+                "taskPriority": 2,
+                "dateEnd": "2025-11-25",
+                "dateInitial": "0001-01-01",
+                "progressState": "Completed",
+                "taskState": "Completed"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "incidence": [
+    {
+      "idProyect": 5,
+      "typeIncidence": "Recursos",
+      "descriptionIncidence": "Licencia presentada por un admin."
     }
   ]
 }

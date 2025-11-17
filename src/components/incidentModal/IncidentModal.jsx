@@ -1,80 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { BsExclamationCircleFill } from "react-icons/bs";
 
-const mockProyectos = [
-  { id: 1, nombre: "Proyecto SmartGym" },
-  { id: 2, nombre: "Migración a la Nube V3" },
-  { id: 3, nombre: "Sistema de Pacientes" },
-];
-
+// ⭐ TIPOS DE INCIDENCIA ACTUALIZADOS INCLUYENDO "Recursos"
 const tiposDeIncidencia = [
   "Humano",
-  "Tecnológico",
+  "Tecnológico", 
   "Material",
+  "Recursos",
   "Externo",
 ];
 
-
-const IncidentModal = ({ show, onHide, proyectos = mockProyectos }) => {
-  const [projectId, setProjectId] = useState("");
+const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, projectId }) => {
   const [incidentType, setIncidentType] = useState("");
   const [description, setDescription] = useState("");
 
+  // Efecto para cargar datos cuando se edita
+  useEffect(() => {
+    if (incidenceData) {
+      // Modo edición
+      setIncidentType(incidenceData.typeIncidence || incidenceData.tipo || "");
+      setDescription(incidenceData.descriptionIncidence || incidenceData.descripcion || "");
+    } else {
+      // Modo creación - resetear
+      setIncidentType("");
+      setDescription("");
+    }
+  }, [incidenceData, show]);
+
   const handleClose = () => {
-    setProjectId("");
     setIncidentType("");
     setDescription("");
-    onHide(); // Llama a la función del padre para cerrar
+    onHide();
   };
 
-  /**
-   * Maneja el envío del formulario.
-   */
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Evita que la página se recargue
+    e.preventDefault();
 
-    // 1. Construir el payload para la API
+    // ⭐ PAYLOAD EXACTO CON SOLO LOS 3 CAMPOS REQUERIDOS
     const payload = {
-      idProyecto: projectId, // Ojo: puede ser 'Number(projectId)' si tu API espera un número
       tipo: incidentType,
-      descripcion: description,
+      descripcion: description
     };
 
-    console.log("Enviando Incidencia a la API:", payload);
-
-    try {
-      // --- Lógica de API (POST) ---
-      // const response = await fetch("URL_DE_TU_API/incidencias", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(payload),
-      // });
-      // if (!response.ok) throw new Error("Error al registrar la incidencia");
-      // -----------------------------
-      
-      handleClose(); // Cierra el modal si todo salió bien
-    } catch (error) {
-      console.error("Error al registrar incidencia:", error);
-      // Aquí podrías mostrar una alerta de error
+    // ✅ Llamar a la función onSubmit del componente padre
+    if (onSubmit) {
+      await onSubmit(payload);
     }
   };
 
   return (
-    // 'onHide' se llama cuando se hace clic en la 'X' o fuera del modal
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>
-          {/* Ícono de advertencia (color 'warning' es naranja/amarillo) */}
           <BsExclamationCircleFill className="text-warning me-2" />
-          Registrar Incidencia
+          {incidenceData ? "Editar Incidencia" : "Registrar Incidencia"}
         </Modal.Title>
       </Modal.Header>
 
-      {/* Usamos un <Form> para manejar el 'onSubmit' */}
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
-         
+          {/* ⭐ INFORMACIÓN DEL PROYECTO (solo lectura) */}
+          {projectId && (
+            <Form.Group className="mb-3">
+              <Form.Label>Proyecto ID</Form.Label>
+              <Form.Control
+                type="text"
+                value={projectId}
+                disabled
+                readOnly
+              />
+              <Form.Text className="text-muted">
+                ID del proyecto asociado a esta incidencia
+              </Form.Text>
+            </Form.Group>
+          )}
+
           <Form.Group className="mb-3">
             <Form.Label>
               Tipo de Incidencia <span className="text-danger">*</span>
@@ -113,12 +114,11 @@ const IncidentModal = ({ show, onHide, proyectos = mockProyectos }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="light" onClick={handleClose}>
+          <Button variant="light" onClick={handleClose} disabled={isLoading}>
             Cancelar
           </Button>
-          {/* El variant 'warning' es el más cercano al naranja */}
-          <Button variant="warning" type="submit">
-            Registrar Incidencia
+          <Button variant="warning" type="submit" disabled={isLoading}>
+            {isLoading ? "Guardando..." : (incidenceData ? "Actualizar" : "Registrar")} Incidencia
           </Button>
         </Modal.Footer>
       </Form>

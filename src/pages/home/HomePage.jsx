@@ -12,7 +12,7 @@ const HomePage = () => {
       </div>
 
       <div className="home-cards">
-        <NavLink to="/proyectslist" className="card">
+        <NavLink to="/projectslist" className="card">
           <Folder className="card-icon" size={36} />
           <h2>Proyectos</h2>
           <p>Gestiona y visualiza todos tus proyectos</p>

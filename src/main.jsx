@@ -5,12 +5,12 @@ import Layout from "./layout/Layout.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import Login from "./pages/login/Login.jsx";
 import Reports from "./pages/reports/Reports.jsx";
-import ProyectList from "./pages/proyectlist/ProyectList.jsx";
-import Proyect from "./pages/proyect/Proyect.jsx";
 import HomePage from "./pages/home/HomePage.jsx";
 import Sidebar from "./sidebar/Sidebar.jsx";
-import CreateProyect from "./pages/createProyect/CreateProyect.jsx";
 import Customer from "./pages/customer/Customer.jsx";
+import Project from "./pages/project/Project.jsx";
+import CreateProject from "./pages/createProject/CreateProject.jsx";
+import ProjectList from "./pages/proyectlist/Project.jsx";
 
 
 const router = createBrowserRouter([
@@ -23,16 +23,16 @@ const router = createBrowserRouter([
         element: <HomePage/>
       },
       {
-        path: '/proyectslist',
-        element: <ProyectList/>
+        path: '/projectslist',
+        element: <ProjectList/>
       },
       {
-        path: '/proyectslist/proyect/:id',
-        element: <Proyect/>
+        path: '/projectslist/project/:id',
+        element: <Project/>
       },
       {
-        path: '/proyectslist/proyect/create',
-        element: <CreateProyect/>
+        path: '/projectslist/project/create',
+        element: <CreateProject/>
       },
       {
         path: '/customers',

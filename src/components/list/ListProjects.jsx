@@ -9,17 +9,15 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import DeleteButton from "../deleteButton/DeleteButton";
-import ModalProyect from "../modalProyect/ModalProyect";
+import ModalProject from "../modalProject/ModalProject";
 
-const ListProyects = () => {
+const ListProjects = () => {
   const navigate = useNavigate();
-
   const [proyectos, setProyectos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
   const [cargando, setCargando] = useState(false);
 
-  // Estado del modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
@@ -30,7 +28,9 @@ const ListProyects = () => {
     const fetchData = async () => {
       try {
         setCargando(true);
-        const response = await fetch("http://localhost:3001/proyectos");
+        const response = await fetch("http://localhost:3001/Projects");
+        // const response = await fetch("http://localhost:3001/Projects/getAllProyects");
+        
         const data = await response.json();
         setProyectos(data);
       } catch (error) {
@@ -45,7 +45,7 @@ const ListProyects = () => {
 
   const proyectosFiltrados = proyectos.filter(
     (p) =>
-      p.nombreProyecto?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      p.nameProject?.toLowerCase().includes(busqueda.toLowerCase()) ||
       p.idProyecto?.toString().includes(busqueda)
   );
 
@@ -57,7 +57,6 @@ const ListProyects = () => {
 
   const handlePagina = (numero) => setPaginaActual(numero);
 
-  // Actualizar estado del proyecto (select)
   const handleEstadoChange = async (projectId, nuevoEstado) => {
     try {
       const response = await fetch(
@@ -100,13 +99,21 @@ const ListProyects = () => {
   const handleUpdateLocal = (proyectoActualizado) => {
     setProyectos((prev) =>
       prev.map((p) =>
-        p.idProyecto === proyectoActualizado.idProyecto
+        p.idProject === proyectoActualizado.idProject
           ? proyectoActualizado
           : p
       )
     );
   };
-
+const traduccionesEstado = {
+  'Planning': 'En Planificación',
+  'In_Progress': 'En Curso',
+  'Finished': 'Terminado',
+  'Completed': 'Completado',
+  'Cancelled': 'Cancelado',
+  'Pending': 'Pendiente',
+  // Añade cualquier otro estado que tengas
+};
   return (
     <div className="container mt-4">
       <Form.Control
@@ -126,26 +133,25 @@ const ListProyects = () => {
         <>
           <Table bordered hover responsive>
             <thead>
-              <tr>
+              <tr className="text-center">
                 <th>ID</th>
                 <th>Proyecto</th>
-                <th>Inicio</th>
-                <th>Estado</th>
-                <th>Equipo</th>
                 <th>Cliente</th>
+                <th>Estado</th> 
+                <th>Equipo</th>
                 <th>Acciones</th>
               </tr>
             </thead>
 
             <tbody>
               {proyectosPagina.length > 0 ? (
-                proyectosPagina.map((p) => (
-                  <tr key={p.idProyecto}>
-                    <td>{p.idProyecto}</td>
-                    <td>{p.nombreProyecto}</td>
-                    <td>{p.fechaInicioProyecto}</td>
-
-                    <td>
+                proyectosPagina.map((project) => (
+                  <tr className="text-center" key={project.idProject}>
+                    <td>{project.idProject}</td>
+                    <td>{project.nameProject}</td>
+                    <td>{project.clientName}</td>
+                    <td>{traduccionesEstado[project.stateProject] || project.stateProject}</td>
+                    {/* <td>
                       <Form.Select
                         size="sm"
                         value={p.estadoProyecto}
@@ -157,10 +163,9 @@ const ListProyects = () => {
                         <option>En curso</option>
                         <option>Terminado</option>
                       </Form.Select>
-                    </td>
+                    </td> */}
 
-                    <td>{p.idEquipo}</td>
-                    <td>{p.idCliente}</td>
+                    <td>{project.teamNumber}</td>
 
                     <td>
                       <Dropdown>
@@ -170,22 +175,27 @@ const ListProyects = () => {
 
                         <Dropdown.Menu>
                           <Dropdown.Item
+                              key={`${project.idProject}-edit`}
+
                             onClick={() =>
-                              navigate(`/proyectslist/proyect/${p.idProyecto}`)
+                              navigate(`/projectslist/project/${project.idProject}`)
                             }
                           >
                             Ver detalles
                           </Dropdown.Item>
 
                           {/*  👉 AQUI SE ABRE EL MODAL */}
-                          <Dropdown.Item onClick={() => handleShowUpdateModal(p)}>
+                          <Dropdown.Item key={`${project.idProject}-modify`} onClick={() => handleShowUpdateModal(project)}>
                             Modificar
                           </Dropdown.Item>
+                          
 
-                          <Dropdown.Item>
+                          {/*Aqui para eliminar*/}
+                          <Dropdown.Item key={`${project.idProject}-delete`}>
                             <DeleteButton
-                              idProject={p.idProyecto}
-                              projectName={p.nombreProyecto}
+                              
+                              idProject={project.idProject}
+                              projectName={project.nameProject}
                               onDelete={setProyectos}
                             />
                           </Dropdown.Item>
@@ -209,10 +219,10 @@ const ListProyects = () => {
 
       {/*  --- MODAL DE ACTUALIZACIÓN --- */}
       {proyectoSeleccionado && (
-        <ModalProyect
+        <ModalProject
           show={showUpdateModal}
           handleClose={handleCloseUpdateModal}
-          proyecto={proyectoSeleccionado}
+          project={proyectoSeleccionado}
           onUpdate={handleUpdateLocal}
         />
       )}
@@ -220,4 +230,4 @@ const ListProyects = () => {
   );
 };
 
-export default ListProyects;
+export default ListProjects;

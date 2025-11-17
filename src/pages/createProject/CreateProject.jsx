@@ -1,35 +1,60 @@
 import { Form, Row, Col, Button, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
-import "../createProyect/createProyect.css";
+import "./createProject.css";
+import { useEffect, useState } from "react";
 
 const defaultValues = {
-  idClient: "",
-  idTeam: "",
+  clientName: "",
+  teamNumber: 0,
   nameProject: "",
   typeProject: "",
   descriptionProject: "",
   dataEnd: "",
-  priorityProject: "",
+  priorityProject: 0,
   budgetProject: "0.00",
   functions: [],
 };
 
-const CreateProyect = (values = defaultValues) => {
-  const responsablesList = [
-    { id: 1, nombre: "Juan Pérez" },
-    { id: 2, nombre: "Ana García" },
-    { id: 3, nombre: "Luis Fernández" },
-  ];
-
-  const clientesList = [
-    { id: 1, nombre: "Cliente A" },
-    { id: 2, nombre: "Cliente B" },
-    { id: 5, nombre: "Cliente Gym" },
-  ];
-
+const CreateProject = (values = defaultValues) => {
+  const [clientesList, setClientesList] = useState([]);
+  const [team,setTeam]= useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/clientsRegistered");
+
+        if (!res.ok) throw new Error("Error al obtener clientes");
+
+        const data = await res.json();
+        setClientesList(data);
+      } catch (err) {
+        setClientsError(err.message);
+      } 
+    };
+
+    fetchClients();
+  }, []);
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/teamsRegistered");
+
+        if (!res.ok) throw new Error("Error al obtener team");
+
+        const data = await res.json();
+        setTeam(data);
+      } catch (err) {
+        setTeamError(err.message);
+      } 
+    };
+
+    fetchTeam();
+  }, []);
+ 
   const {
     register,
     handleSubmit,
@@ -53,7 +78,7 @@ const CreateProyect = (values = defaultValues) => {
   };
 
   const onSubmit = async (data) => {
-    const endpoint = "http://localhost:3001/proyectos";
+    const endpoint = "http://localhost:3001/Projects";
 
     // Convertimos FECHA
     if (data.dataEnd) {
@@ -78,7 +103,7 @@ const CreateProyect = (values = defaultValues) => {
 
       await response.json();
       alert("¡Proyecto creado exitosamente!");
-      navigate("/proyectslist");
+      navigate("/projectslist");
     } catch (err) {
       alert("Error al crear proyecto: " + err.message);
     }
@@ -89,8 +114,6 @@ const CreateProyect = (values = defaultValues) => {
       <h2 className="mb-4 form-title-custom">Información del Proyecto</h2>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-
-        {/* === NOMBRE DEL PROYECTO === */}
         <Row className="mb-3">
           <Col md={6}>
             <Form.Group controlId="nameProject">
@@ -113,26 +136,26 @@ const CreateProyect = (values = defaultValues) => {
 
           {/* === RESPONSABLE / idTeam === */}
           <Col md={6}>
-            <Form.Group controlId="idTeam">
+            <Form.Group controlId="teamNumber">
               <Form.Label>
                 Equipo <span className="text-danger">*</span>
               </Form.Label>
               <Form.Select
-                {...register("idTeam", {
+                {...register("teamNumber", {
                   required: "Debe seleccionar un responsable.",
                 })}
-                isInvalid={!!errors.idTeam}
+                isInvalid={!!errors.teamNumber}
               >
                 <option value="">Seleccione el equipo...</option>
-                {responsablesList.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.nombre}
+                {team.map((r) => (
+                  <option key={r.numberTeam} value={r.numberTeam}>
+                    {r.numberTeam}
                   </option>
                 ))}
               </Form.Select>
 
               <Form.Control.Feedback type="invalid">
-                {errors.idTeam?.message}
+                {errors.teamNumber?.message}
               </Form.Control.Feedback>
             </Form.Group>
           </Col>
@@ -176,9 +199,7 @@ const CreateProyect = (values = defaultValues) => {
                       {...register(`functions.${index}.functionName`, {
                         required: "Campo obligatorio",
                       })}
-                      isInvalid={
-                        !!errors.functions?.[index]?.functionName
-                      }
+                      isInvalid={!!errors.functions?.[index]?.functionName}
                     />
                     <Form.Control.Feedback type="invalid">
                       {errors.functions?.[index]?.functionName?.message}
@@ -200,21 +221,13 @@ const CreateProyect = (values = defaultValues) => {
                   as="textarea"
                   rows={2}
                   placeholder="Descripción de la funcionalidad"
-                  {...register(
-                    `functions.${index}.functionDescription`,
-                    {
-                      required: "Campo obligatorio",
-                    }
-                  )}
-                  isInvalid={
-                    !!errors.functions?.[index]?.functionDescription
-                  }
+                  {...register(`functions.${index}.functionDescription`, {
+                    required: "Campo obligatorio",
+                  })}
+                  isInvalid={!!errors.functions?.[index]?.functionDescription}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {
-                    errors.functions?.[index]?.functionDescription
-                      ?.message
-                  }
+                  {errors.functions?.[index]?.functionDescription?.message}
                 </Form.Control.Feedback>
               </div>
             ))}
@@ -237,25 +250,25 @@ const CreateProyect = (values = defaultValues) => {
         {/* === CLIENTE === */}
         <Row className="mb-3">
           <Col md={6}>
-            <Form.Group controlId="idClient">
+            <Form.Group controlId="clientName">
               <Form.Label>
                 Cliente <span className="text-danger">*</span>
               </Form.Label>
               <Form.Select
-                {...register("idClient", {
+                {...register("clientName", {
                   required: "Debe seleccionar un cliente.",
                 })}
-                isInvalid={!!errors.idClient}
+                isInvalid={!!errors.clientName}
               >
                 <option value="">Seleccione el cliente</option>
                 {clientesList.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre}
+                  <option key={c.dniClient} value={c.dniClient}>
+                    {c.fullNameClient}
                   </option>
                 ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">
-                {errors.idClient?.message}
+                {errors.clientName?.message}
               </Form.Control.Feedback>
             </Form.Group>
           </Col>
@@ -296,9 +309,9 @@ const CreateProyect = (values = defaultValues) => {
                 isInvalid={!!errors.priorityProject}
               >
                 <option value="">Seleccione</option>
-                <option value="1">Alta</option>
-                <option value="2">Media</option>
-                <option value="3">Baja</option>
+                <option value="0">Alta</option>
+                <option value="1">Media</option>
+                <option value="2">Baja</option>
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.priorityProject?.message}
@@ -316,8 +329,7 @@ const CreateProyect = (values = defaultValues) => {
                   required: "Fecha obligatoria",
                   pattern: {
                     value: /^\d{2}\/\d{2}\/\d{4}$/,
-                    message:
-                      "Formato inválido (use dd/mm/aaaa)",
+                    message: "Formato inválido (use dd/mm/aaaa)",
                   },
                 })}
                 isInvalid={!!errors.dataEnd}
@@ -358,7 +370,7 @@ const CreateProyect = (values = defaultValues) => {
 
           <Button
             variant="light"
-            onClick={() => navigate("/proyectslist")}
+            onClick={() => navigate("/projectslist")}
             className="cancel-btn-custom"
           >
             Cancelar
@@ -369,4 +381,4 @@ const CreateProyect = (values = defaultValues) => {
   );
 };
 
-export default CreateProyect;
+export default CreateProject;

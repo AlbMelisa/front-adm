@@ -1,104 +1,72 @@
-// FuncionalidadesDashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
-  Row,
-  Col,
-  Card,
-  ProgressBar,
-  Button,
   Accordion,
 } from "react-bootstrap";
-import { BsPencil, BsTrash, BsPlusLg } from "react-icons/bs";
 import FeatureAccordion from "../featureAccordion/FeatureAccordion";
 import "./features.css";
-const initialFeatures = [
-  {
-    id: 1,
-    nombre: "Sistema de Autenticacion",
-    descripcion: "wiknrenme",
-    tareas: [
-      {
-        id: 101,
-        nombre: "Implementar login",
-        descripcion: "enriemeimei",
-        asignado: "Carlos López",
-        estado: "Completada",
-      },
-      {
-        id: 102,
-        nombre: "Implementar ékcreimelmel",
-        descripcion: "enriemeimei",
-        asignado: "Juan Pérez",
-        estado: "En Progreso",
-      },
-    ],
-    incidencias: [
-      {
-        id: 201,
-        nombre: "Computadora",
-        tipo: "Tecnológico",
-        cantidad: 1,
-        necesidad: "Se necesita",
-      },
-      {
-        id: 202,
-        nombre: "Desarrollador Frontend",
-        tipo: "Humano",
-        cantidad: 3,
-        necesidad: "Cantidad: 3",
-      },
-    ],
-  },
-  {
-    id: 2,
-    nombre: "Cargar Datos",
-    descripcion: "eneriemeimei",
-    tareas: [{ id: 103, nombre: "Definir API", estado: "Pendiente" }],
-    incidencias: [
-      { id: 203, nombre: "Servidor BD", tipo: "Tecnológico", cantidad: 1 },
-    ],
-  },
-];
 
-const Feature = () => {
-  const [features, setFeatures] = useState(initialFeatures);
-  const [showModal, setShowModal] = useState(false);
+const Feature = ({ project, onTaskAdded }) => {
+  const [features, setFeatures] = useState([]);
 
-  // Calcula los totales para las tarjetas de resumen
-  const totalTareas = features.reduce((acc, f) => acc + f.tareas.length, 0);
-  const tareasCompletadas = features
-    .flatMap((f) => f.tareas)
-    .filter((t) => t.estado === "Completada").length;
-  const tareasEnProgreso = features
-    .flatMap((f) => f.tareas)
-    .filter((t) => t.estado === "En Progreso").length;
-  const tareasPendientes = totalTareas - tareasCompletadas - tareasEnProgreso;
-  const progresoGeneral =
-    totalTareas > 0 ? (tareasCompletadas / totalTareas) * 100 : 0;
+  useEffect(() => {
+    if (!project || !project.functions) return;
+    console.log("Llega a Feature:", project);
+    
+    // Convertir datos de la API a tu estructura
+    const mappedFeatures = project.functions.map((func, index) => ({
+      id: index + 1,
+      nombre: func.functionName,
+      descripcion: func.functionDescription,
+      
+      // ⭐ MOSTRAR TODAS LAS TAREAS
+      tareas: func.tasks?.map((t) => ({
+        id: t.idTask,
+        nombre: t.taskName,
+        descripcion: t.taskDescription,
+        // ⭐ Mapear estados para que coincidan con getStatusBadge
+        estado: getEstadoTarea(t),
+        // Propiedades adicionales que podrías necesitar
+        prioridad: t.taskPriority,
+        fechaFin: t.dateEnd,
+        fechaInicio: t.dateInitial,
+      })) || [],
 
-  // Lógica para el modal
+      incidencias: [], // Mantenemos vacío como en tu código original
+    }));
+    
+    console.log("Features mapeadas:", mappedFeatures);
+    setFeatures(mappedFeatures);
+  }, [project]);
+
+  // ⭐ Función para determinar el estado de la tarea
+  const getEstadoTarea = (tarea) => {
+    if (tarea.progressState === "Completed" || tarea.taskState === "Completed") {
+      return "Completada";
+    } else if (tarea.progressState === "In_Progress" || tarea.taskState === "In_Progress") {
+      return "En Progreso";
+    } else if (tarea.progressState === "Cancelled" || tarea.taskState === "Cancelled") {
+      return "Cancelada";
+    } else {
+      return "Pendiente";
+    }
+  };
 
   return (
-    <Container fluid className="dashboard-container pt-4 ">
+    <Container fluid className="dashboard-container pt-4">
       <Accordion defaultActiveKey="0" alwaysOpen>
         {features.map((feature, index) => (
           <FeatureAccordion
             key={feature.id}
             eventKey={index.toString()}
             feature={feature}
+            onTaskAdded={onTaskAdded}
           />
         ))}
       </Accordion>
-
-      {/* --- Modal --- */}
-      {/* <AddFeatureModal
-        show={showModal}
-        onHide={handleCloseModal}
-        onAdd={handleAddFeature}
-      />  */}
     </Container>
   );
 };
 
 export default Feature;
+
