@@ -44,7 +44,7 @@ const ProjectList = () => {
       <ProyectStatus Proyect={proyectos} />
 
       {/* Lista de proyectos */}
-      <ListProjects  />
+      <ListProjects   />
     </Container>
   );
 };

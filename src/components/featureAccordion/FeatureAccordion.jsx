@@ -141,7 +141,7 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
   };
 
   return (
-    <Accordion.Item eventKey={eventKey} className="feature-accordion-item">
+    <Accordion.Item  eventKey={eventKey} className="feature-accordion-item">
       <Accordion.Header>
         <Row className="w-100">
           <Col>

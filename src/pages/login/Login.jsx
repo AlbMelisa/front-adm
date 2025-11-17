@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button } from 'react-bootstrap';
-import { FaUser, FaLock, FaRegUser } from 'react-icons/fa'; // Importa los iconos necesarios
-import { useNavigate } from 'react-router-dom'; // Para la redirección después del login
+import { FaUser, FaLock, FaRegUser, FaDumbbell } from 'react-icons/fa'; // Agregamos FaDumbbell
+import { useNavigate } from 'react-router-dom';
 import '../login/login.css'
 
 const Login = () => {
@@ -26,19 +26,16 @@ const Login = () => {
   return (
       <div className="login-page-container"> {/* Contenedor para el fondo y centrado */}
       <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Card className="login-card shadow p-4"> {/* Card con sombra y padding */}
+        <Card className="login-card shadow p-4 w-100"> {/* Card con sombra y padding */}
           <Card.Body className="text-center">
             
-            {/* Logo o Icono Principal */}
+            {/* Logo o Icono Principal - AHORA CON PESA */}
             <div className="login-logo-container mb-3">
-              {/* Puedes usar una imagen aquí <img src="tu_logo.png" alt="SS Mobile Logo" className="login-logo" /> */}
-              {/* O un div placeholder como en el Navbar anterior, o iconos */}
               <div className="login-logo-icon">
-                {/* Ícono de "SS Mobile" */}
-                {/* Simulamos el icono de las flechas con CSS */}
+                <FaDumbbell className="dumbbell-icon" style={{ fontSize: '3rem', color: '#ffffffff' }} />
               </div>
             </div>
-            <Card.Title className="mb-4">SS Mobile</Card.Title>
+            <Card.Title className="mb-4">GYM Software</Card.Title>
             <h4 className="mb-4">Iniciar Sesión</h4>
 
             {/* Formulario de Login */}

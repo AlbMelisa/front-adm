@@ -262,7 +262,7 @@ const CreateProject = (values = defaultValues) => {
               >
                 <option value="">Seleccione el cliente</option>
                 {clientesList.map((c) => (
-                  <option key={c.dniClient} value={c.dniClient}>
+                  <option key={c.dniClient} value={c.fullNameClient}>
                     {c.fullNameClient}
                   </option>
                 ))}

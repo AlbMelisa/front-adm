@@ -1,4 +1,11 @@
 {
+  "Auth": [
+    {
+      "userName": "Eze7",
+      "password": "EzeZeballos123",
+      "id": "529f"
+    }
+  ],
   "Projects": [
     {
       "idProject": 5,
@@ -68,7 +75,8 @@
           "functionName": "mmm",
           "functionDescription": "mmm"
         }
-      ]
+      ],
+      "id": "45b0"
     },
     {
       "idProject": 4928,
@@ -86,7 +94,20 @@
           "functionName": "kmienie",
           "functionDescription": "eerere"
         }
-      ]
+      ],
+      "id": "2dd7"
+    },
+    {
+      "id": "4b40",
+      "nameProject": "neinre@32",
+      "teamNumber": "101",
+      "descriptionProject": "menirnerie",
+      "clientName": "46652333",
+      "typeProject": "Web",
+      "priorityProject": "1",
+      "dataEnd": "2025-12-20T00:00:00",
+      "budgetProject": "117000",
+      "functions": []
     }
   ],
   "clientsRegistered": [
@@ -95,28 +116,32 @@
       "dniClient": 46652333,
       "directionClient": "Lopez 123",
       "mailClient": "lucias@gmail.com",
-      "phoneClient": "381215102"
+      "phoneClient": "381215102",
+      "id": "0dff"
     },
     {
       "fullNameClient": "Melisa Berrondo",
       "dniClient": 42989748,
       "directionClient": "Tafi Viejo",
       "mailClient": "melisab@gmail.com",
-      "phoneClient": "381200369"
+      "phoneClient": "381200369",
+      "id": "ddeb"
     },
     {
       "fullNameClient": "Agustin Marchesin",
       "dniClient": 38784522,
       "directionClient": "La boca",
       "mailClient": "marche@gmail.com",
-      "phoneClient": "387411032"
+      "phoneClient": "387411032",
+      "id": "713e"
     },
     {
       "fullNameClient": "Fernando Gago",
       "dniClient": 42988748,
       "directionClient": "Lazaro 45",
       "mailClient": "gago@gmail.com",
-      "phoneClient": "386598620"
+      "phoneClient": "386598620",
+      "id": "6fd8"
     }
   ],
   "teamsRegistered": [
@@ -141,11 +166,13 @@
           "dniEmployee": 45548144,
           "rolEmployee": "Developer"
         }
-      ]
+      ],
+      "id": "16c1"
     },
     {
       "numberTeam": 107,
-      "employees": []
+      "employees": [],
+      "id": "a4c6"
     }
   ],
   "ProjectsgetById6": [
@@ -257,14 +284,50 @@
             ]
           }
         ]
-      }
+      },
+      "id": "c555"
     }
   ],
   "incidence": [
     {
       "idProyect": 5,
       "typeIncidence": "Recursos",
-      "descriptionIncidence": "Licencia presentada por un admin."
+      "descriptionIncidence": "Licencia presentada por un admin.",
+      "id": "4cb2"
+    }
+  ],
+  "Clients": [
+    {
+      "fullNameClient": "Milagros Albornoz",
+      "dniClient": 46652333,
+      "directionClient": "Lopez 123",
+      "mailClient": "lucias@gmail.com",
+      "phoneClient": "381215102",
+      "id": "4b3c"
+    },
+    {
+      "fullNameClient": "Melisa Berrondo",
+      "dniClient": 42988748,
+      "directionClient": "Tafi Viejo",
+      "mailClient": "melisab@gmail.com",
+      "phoneClient": "381200369",
+      "id": "4b86"
+    },
+    {
+      "fullNameClient": "Agustin Marchesin",
+      "dniClient": 38784522,
+      "directionClient": "La boca",
+      "mailClient": "marche@gmail.com",
+      "phoneClient": "387411032",
+      "id": "4fd8"
+    },
+    {
+      "fullNameClient": "Fernando Gago",
+      "dniClient": 42988748,
+      "directionClient": "Lazaro 45",
+      "mailClient": "gago@gmail.com",
+      "phoneClient": "386598620",
+      "id": "57d3"
     }
   ]
 }

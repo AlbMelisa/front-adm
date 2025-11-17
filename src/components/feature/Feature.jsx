@@ -53,7 +53,7 @@ const Feature = ({ project, onTaskAdded }) => {
   };
 
   return (
-    <Container fluid className="dashboard-container pt-4">
+    <Container fluid className="pt-4">
       <Accordion defaultActiveKey="0" alwaysOpen>
         {features.map((feature, index) => (
           <FeatureAccordion
