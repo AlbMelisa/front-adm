@@ -178,7 +178,7 @@ const traduccionesEstado = {
                               key={`${project.idProject}-edit`}
 
                             onClick={() =>
-                              navigate(`/projectslist/project/${project.idProject}`)
+                              navigate(`/projectslist/${project.idProject}`)
                             }
                           >
                             Ver detalles

@@ -175,7 +175,7 @@
       "id": "a4c6"
     }
   ],
-  "ProjectsgetById6": [
+  "ProjectsgetById": [
     {
       "proyect": {
         "idProject": 6,
@@ -242,8 +242,8 @@
                 "taskPriority": 0,
                 "dateEnd": "2025-11-25",
                 "dateInitial": "0001-01-01",
-                "progressState": "In_Progress",
-                "taskState": "In_Progress"
+                "progressState": "Completed",
+                "taskState": "Completed"
               },
               {
                 "idTask": 39,
@@ -285,7 +285,7 @@
           }
         ]
       },
-      "id": "c555"
+      "id": "6"
     }
   ],
   "incidence": [
