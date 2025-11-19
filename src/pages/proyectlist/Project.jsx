@@ -4,6 +4,7 @@ import { Button, Container } from "react-bootstrap";
 import ProyectStatus from "../../components/proyectStatus/ProyectStatus";
 import { useNavigate } from "react-router-dom";
 import ListProjects from "../../components/list/ListProjects";
+import '../project/project.css'
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const ProjectList = () => {
       <div className="d-flex mb-3 justify-content-between pt-4">
         <h4 className="mb-3">Proyectos Registrados</h4>
         <Button
+          className="new-proyect"
           variant="secondary"
           onClick={() => navigate(`/projectslist/project/create`)}
         >

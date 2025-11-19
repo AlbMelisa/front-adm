@@ -9,6 +9,7 @@ import {
 } from 'react-bootstrap';
 import { BsPencil, BsTrash, BsPlusLg } from 'react-icons/bs';
 import IncidentModal from '../incidentModal/IncidentModal';
+import '../incidentModal/incidentModal.css'
 
 const getBadgeBg = (tipo) => {
   switch (tipo) {
@@ -130,7 +131,7 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
   return (
     <Accordion className="pt-3 m-2" defaultActiveKey={['0']}>
       <Accordion.Item eventKey="0">
-        <Accordion.Header>Incidencias</Accordion.Header>
+        <Accordion.Header className='incidencias-header'>Incidencias</Accordion.Header>
         <Accordion.Body>
           <div className="section-header mb-3">
             <div className="d-flex justify-content-between align-items-center">
@@ -141,6 +142,7 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                 </Badge>
               </h5>
               <Button
+                className="btn-agregar-incidencia"
                 variant="outline-primary"
                 size="sm"
                 onClick={handleAddIncidence}
@@ -191,6 +193,7 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                         </div>
                         <div className="d-flex ms-2">
                           <Button 
+                            
                             variant="outline-secondary" 
                             size="sm" 
                             className="me-1"
@@ -200,6 +203,7 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                             <BsPencil />
                           </Button>
                           <Button 
+                            
                             variant="outline-danger" 
                             size="sm"
                             onClick={() => handleDeleteIncidence(inc.id || inc.idIncidence)}

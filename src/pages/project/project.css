@@ -116,6 +116,17 @@ body {
   color: #000000 !important; /* Color al pasar el mouse */
 }
 
+.new-proyect {
+  background-color: #7c1fc9;
+  color: #e9ecef;
+  border: none;
+}
+
+.new-proyect:hover {
+  background-color: #ad65f0;
+  color: #e9ecef;
+  border: none;
+}
 /* Evitar que los iconos activen el acordeón (opcional, requiere JS) */
 /* Para una réplica visual simple, esto es suficiente. */
 /* Si quisieras que los botones NO abran el acordeón, */

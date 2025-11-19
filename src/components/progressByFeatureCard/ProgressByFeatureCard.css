@@ -1,0 +1,11 @@
+.completed-bar {
+  background-color: #7d18c0 !important; /* verde */
+}
+
+.inprogress-bar {
+  background-color: rgb(206, 116, 231) !important; /* azul */
+}
+
+.pending-bar {
+  background-color: #9e9e9e !important; /* gris */
+}

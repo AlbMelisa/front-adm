@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, ProgressBar } from 'react-bootstrap';
 import { BarChartSteps } from 'react-bootstrap-icons';
 import '../statCard/statCard.css'
+import './ProgressByFeatureCard.css'
 
 const ProgressByFeatureCard = ({ features }) => {
   // Función para calcular el progreso de cada funcionalidad
@@ -49,18 +50,21 @@ const ProgressByFeatureCard = ({ features }) => {
         {/* Barra de progreso con múltiples variantes */}
         <ProgressBar className="progress-bar-custom">
           <ProgressBar 
+            className="completed-bar"
             variant="success" 
             now={(completed / total) * 100} 
             key={1}
             label={completed > 0 ? `${completed}` : ''}
           />
           <ProgressBar 
+            className="inprogress-bar"
             variant="info" 
             now={(inProgress / total) * 100} 
             key={2}
             label={inProgress > 0 ? `${inProgress}` : ''}
           />
           <ProgressBar 
+            className="pending-bar"
             variant="secondary" 
             now={((total - completed - inProgress) / total) * 100} 
             key={3}

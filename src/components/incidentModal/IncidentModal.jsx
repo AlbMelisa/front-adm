@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { BsExclamationCircleFill } from "react-icons/bs";
+import './incidentModal.css'
 
 // ⭐ TIPOS DE INCIDENCIA ACTUALIZADOS INCLUYENDO "Recursos"
 const tiposDeIncidencia = [
@@ -114,10 +115,10 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="light" onClick={handleClose} disabled={isLoading}>
+          <Button className="btn-cancelar-incidencia" variant="light" onClick={handleClose} disabled={isLoading}>
             Cancelar
           </Button>
-          <Button variant="warning" type="submit" disabled={isLoading}>
+          <Button className="btn-registrar-incidencia" variant="warning" type="submit" disabled={isLoading}>
             {isLoading ? "Guardando..." : (incidenceData ? "Actualizar" : "Registrar")} Incidencia
           </Button>
         </Modal.Footer>

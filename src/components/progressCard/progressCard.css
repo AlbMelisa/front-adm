@@ -6,9 +6,9 @@
 
 .progress-bar-custom {
   height: 0.75rem; /* Le da el grosor de la imagen */
-  background-color: #e9ecef; /* Color de fondo de la barra */
+  background-color: #ded2e6; /* Color de fondo de la barra */
 }
 
 .progress-bar.bg-dark {
-  background-color: #212529 !important; /* Color de la barra (negro) */
+  background-color: #7d18c0 !important; /* Color de la barra (negro) */
 }

@@ -26,14 +26,17 @@
 
 /* Colores de los puntos (basados en la imagen original) */
 .dot-humanos {
-  background-color: #4285f4;
-} /* Azul */
+  background-color: #5e18ff;
+} 
+
 .dot-materiales {
-  background-color: #fbbc05;
-} /* Naranja/Amarillo */
+  background-color:  #7c18ff;
+} 
+
 .dot-tecnologicos {
-  background-color: #9333ea;
-} /* Púrpura */
+  background-color: #aa18ff;
+} 
+
 .dot-financieros {
-  background-color: #34a853;
+  background-color: #ff18d8;
 } /* Verde */
