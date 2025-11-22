@@ -1,144 +1,56 @@
-
 .login-page-container {
-    background-color: #f1e9f4; /* Fondo gris claro */
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden; /* Asegura que las olas no se salgan */
+  background: #ddc6ef;
+  min-height: 100vh;
+}
+.button-login{
+  background-color: #410363;
 }
 
-/* --------------------------------------
-   ESTILO DEL FONDO CON OLAS
-   -------------------------------------- */
-.login-page-container::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 150px; /* Altura de las "olas" */
-    clip-path: ellipse(120% 60% at 50% 100%); /* Forma de onda */
-    z-index: 0; /* Coloca las olas detrás del contenido */
-}
-
-/* --------------------------------------
-   ESTILO DE LA TARJETA DE LOGIN
-   -------------------------------------- */
 .login-card {
-    width: 100%;
-    padding: 10px;
-    max-width: 450px; /* Ancho máximo para la tarjeta */
-    border-radius: 15px; /* Bordes más redondeados */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
-    z-index: 1; /* Asegura que la tarjeta esté encima de las olas */
-    padding: 30px !important; /* Más padding interno */
+  width: 450px;
+  border-radius: 14px;
+  border: none;
 }
 
-.login-card .card-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #333;
+.login-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  background: #33005c;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
-/* --------------------------------------
-   ESTILO DEL LOGO "SS Mobile"
-   -------------------------------------- */
-.login-logo-container {
-    margin-bottom: 25px; /* Espacio debajo del logo */
+.login-main-icon {
+  color: white;
+  font-size: 32px;
 }
 
-.login-logo-icon {
-    /* Simula el icono de las flechas azules */
-    width: 60px;
-    height: 60px;
-    background-color: #921ac5; /* Color azul */
-    border-radius: 10px;
-    margin: 0 auto; /* Centrar el icono */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden; /* Oculta partes del "icono interno" */
+.login-title {
+  font-size: 28px;
+  font-weight: bold;
 }
 
-.login-logo-icon::before,
-.login-logo-icon::after {
-    content: '';
-    position: absolute;
-    background-color: white;
-    border-radius: 3px;
+.login-subtitle {
+  font-size: 15px;
+  color: #666;
 }
 
-.login-logo-icon::before {
-    width: 25px;
-    height: 8px;
-    transform: rotate(45deg);
-    top: 25px;
-    left: 10px;
+.register-link {
+  color: #c71d1d;
+  text-decoration: none;
 }
 
-.login-logo-icon::after {
-    width: 25px;
-    height: 8px;
-    transform: rotate(-45deg);
-    top: 25px;
-    right: 10px;
+.register-link:hover {
+  text-decoration: underline;
 }
 
-/* --------------------------------------
-   ESTILOS DE FORMULARIO Y BOTONES
-   -------------------------------------- */
-.login-card .form-label {
-    text-align: left;
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #555;
+input.form-control {
+  padding: 10px;
 }
 
-.login-card .form-control {
-    border-radius: 8px; /* Bordes redondeados para inputs */
-    padding: 10px 15px;
-    border: 1px solid #ffffff;
-}
-
-.login-card .form-control:focus {
-    border-color: #5d0fb7;
-    box-shadow: 0 0 0 0.25rem rgba(164, 44, 229, 0.429);
-}
-
-.login-card .btn-primary {
-    background-color: #a72ce5; /* Azul primario */
-    border-color: #ad2ce5;
-    border-radius: 8px;
-    padding: 10px 0;
-    font-weight: 600;
-}
-
-.login-card .btn-primary:hover {
-    background-color: #8223b6;
-    border-color: #7820d0;
-}
-
-/* --------------------------------------
-   TEXTO PEQUEÑO Y ENLACE DE REGISTRO
-   -------------------------------------- */
 .small-text-login {
-    font-size: 0.9rem;
-    color: #777;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.small-text-login a {
-    color: #e52ce5;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.small-text-login a:hover {
-    text-decoration: underline;
+  font-size: 14px;
 }

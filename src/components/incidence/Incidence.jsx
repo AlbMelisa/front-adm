@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
-import {
-  Accordion,
-  Button,
-  Badge,
-  Card,
-  Row,
-  Col
-} from 'react-bootstrap';
-import { BsPencil, BsTrash, BsPlusLg } from 'react-icons/bs';
-import IncidentModal from '../incidentModal/IncidentModal';
-import '../incidentModal/incidentModal.css'
+import React, { useEffect, useState } from "react";
+import { Accordion, Button, Badge, Card, Row, Col } from "react-bootstrap";
+import { BsPlusLg } from "react-icons/bs";
+import IncidentModal from "../incidentModal/IncidentModal";
+import "../incidentModal/incidentModal.css";
 
 const getBadgeBg = (tipo) => {
   switch (tipo) {
@@ -41,10 +34,49 @@ const getStatusBadge = (estado) => {
   }
 };
 
+// Array de tipos de incidencia
+const incidenceTypes = ["Humano", "Tecnológico", "Material", "Recursos"];
+
 const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedIncidence, setSelectedIncidence] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const storedUserStr = localStorage.getItem("user");
+    if (storedUserStr) {
+      try {
+        const userObj = JSON.parse(storedUserStr);
+        if (userObj && userObj.rolEmployee) {
+          setUserRole(userObj.rolEmployee);
+        }
+      } catch (error) {
+        console.error("Error al leer usuario:", error);
+      }
+    }
+  }, []);
+  const verifyToken = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return { isValid: false, message: "No hay token de autenticación" };
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        localStorage.removeItem("token");
+        return { isValid: false, message: "Token expirado" };
+      }
+
+      return { isValid: true, token };
+    } catch (parseError) {
+      localStorage.removeItem("token");
+      return { isValid: false, message: "Token inválido" };
+    }
+  };
 
   // Función para manejar la agregar incidencia
   const handleAddIncidence = () => {
@@ -52,64 +84,50 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
     setShowModal(true);
   };
 
-  // Función para manejar la edición de incidencias
-  const handleEditIncidence = (inc) => {
-    setSelectedIncidence(inc);
-    setShowModal(true);
-  };
-
-  // Función para manejar la eliminación de incidencias
-  const handleDeleteIncidence = async (incidenceId) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta incidencia?")) {
-      try {
-        const response = await fetch(`http://localhost:3001/incidences/${incidenceId}`, {
-          method: 'DELETE'
-        });
-
-        if (!response.ok) {
-          throw new Error('Error al eliminar la incidencia');
-        }
-
-        if (onIncidenceAdded) {
-          onIncidenceAdded();
-        }
-
-        alert('Incidencia eliminada exitosamente');
-      } catch (error) {
-        console.error('Error al eliminar incidencia:', error);
-        alert('Error al eliminar la incidencia: ' + error.message);
-      }
-    }
-  };
-
-  // ⭐ FUNCIÓN CORREGIDA PARA EL POST CON SOLO 3 CAMPOS
+  // ⭐ FUNCIÓN CORREGIDA PARA EL POST CON EL FORMATO EXACTO
   const handleSubmitIncidence = async (incidenceData) => {
     setIsLoading(true);
     try {
-      // ⭐ PAYLOAD EXACTO CON SOLO LOS 3 CAMPOS REQUERIDOS
+      // Verificar token antes de enviar
+      const tokenValidation = verifyToken();
+      if (!tokenValidation.isValid) {
+        throw new Error(tokenValidation.message);
+      }
+
+      // ⭐ PAYLOAD EXACTO CON EL FORMATO ESPECIFICADO
       const incidencePayload = {
         idProyect: projectId, // Usar el projectId que viene como prop
         typeIncidence: incidenceData.tipo,
-        descriptionIncidence: incidenceData.descripcion
+        descriptionIncidence: incidenceData.descripcion,
       };
 
-      console.log("Enviando incidencia:", incidencePayload);
 
-      // ⭐ POST A LA RUTA ESPECIFICADA
-      const response = await fetch('http://localhost:3001/Incidence', {
-        method: 'POST',
+      // ⭐ POST A LA RUTA CORRECTA CON AUTENTICACIÓN
+      const response = await fetch("http://localhost:5111/api/Incidence", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenValidation.token}`,
         },
-        body: JSON.stringify(incidencePayload)
+        body: JSON.stringify(incidencePayload),
       });
 
+      // Manejar error 401
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        throw new Error(
+          "Sesión expirada. Por favor, inicia sesión nuevamente."
+        );
+      }
+
       if (!response.ok) {
-        throw new Error('Error al crear la incidencia');
+        const errorText = await response.text();
+        throw new Error(
+          `Error ${response.status}: ${errorText || response.statusText}`
+        );
       }
 
       const result = await response.json();
-      console.log("Incidencia creada exitosamente:", result);
 
       setShowModal(false);
       setSelectedIncidence(null);
@@ -118,20 +136,26 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
         onIncidenceAdded();
       }
 
-      alert('Incidencia creada exitosamente');
-
+      alert("Incidencia creada exitosamente");
     } catch (error) {
-      console.error('Error al crear incidencia:', error);
-      alert('Error al crear la incidencia: ' + error.message);
+      console.error("Error al crear incidencia:", error);
+
+      if (error.message.includes("sesión") || error.message.includes("token")) {
+        alert(`Error de autenticación: ${error.message}`);
+      } else {
+        alert("Error al crear la incidencia: " + error.message);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Accordion className="pt-3 m-2" defaultActiveKey={['0']}>
+    <Accordion className="pt-3 m-2" defaultActiveKey={["0"]}>
       <Accordion.Item eventKey="0">
-        <Accordion.Header className='incidencias-header'>Incidencias</Accordion.Header>
+        <Accordion.Header className="incidencias-header">
+          Incidencias
+        </Accordion.Header>
         <Accordion.Body>
           <div className="section-header mb-3">
             <div className="d-flex justify-content-between align-items-center">
@@ -141,15 +165,18 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                   {incidences?.length || 0}
                 </Badge>
               </h5>
-              <Button
-                className="btn-agregar-incidencia"
-                variant="outline-primary"
-                size="sm"
-                onClick={handleAddIncidence}
-                disabled={isLoading}
-              >
-                <BsPlusLg className="me-1" /> Agregar Incidencia
-              </Button>
+              {['ProjectManager', 'Developer', 'Manager'].includes(userRole) && (
+                <Button
+                  className="btn-agregar-incidencia"
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={handleAddIncidence}
+                  disabled={isLoading}
+                >
+                  <BsPlusLg className="me-1" /> Agregar Incidencia
+                </Button>
+
+              )}
             </div>
           </div>
 
@@ -162,10 +189,13 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="flex-grow-1">
                           <Card.Title className="h6">
-                            {inc.typeIncidence || inc.tipo || "Tipo no especificado"}{" "}
+                            {inc.typeIncidence ||
+                              inc.tipo ||
+                              "Tipo no especificado"}{" "}
                             <Badge
                               className={
-                                inc.typeIncidence === "Tecnológico" || inc.tipo === "Tecnológico"
+                                inc.typeIncidence === "Tecnológico" ||
+                                inc.tipo === "Tecnológico"
                                   ? "badge-tecnologico"
                                   : ""
                               }
@@ -174,8 +204,10 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                               {inc.typeIncidence || inc.tipo}
                             </Badge>
                             {inc.incidenceState || inc.estado ? (
-                              <Badge 
-                                bg={getStatusBadge(inc.incidenceState || inc.estado)} 
+                              <Badge
+                                bg={getStatusBadge(
+                                  inc.incidenceState || inc.estado
+                                )}
                                 className="ms-1"
                               >
                                 {inc.incidenceState || inc.estado}
@@ -183,34 +215,19 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                             ) : null}
                           </Card.Title>
                           <Card.Text className="mb-0">
-                            {inc.descriptionIncidence || inc.descripcion || "Sin descripción"}
+                            {inc.descriptionIncidence ||
+                              inc.descripcion ||
+                              "Sin descripción"}
                           </Card.Text>
                           {inc.reportDate && (
                             <small className="text-muted d-block mt-1">
-                              Fecha: {new Date(inc.reportDate).toLocaleDateString()}
+                              Fecha:{" "}
+                              {new Date(inc.reportDate).toLocaleDateString()}
                             </small>
                           )}
-                        </div>
-                        <div className="d-flex ms-2">
-                          <Button 
-                            
-                            variant="outline-secondary" 
-                            size="sm" 
-                            className="me-1"
-                            onClick={() => handleEditIncidence(inc)}
-                            disabled={isLoading}
-                          >
-                            <BsPencil />
-                          </Button>
-                          <Button 
-                            
-                            variant="outline-danger" 
-                            size="sm"
-                            onClick={() => handleDeleteIncidence(inc.id || inc.idIncidence)}
-                            disabled={isLoading}
-                          >
-                            <BsTrash />
-                          </Button>
+                          <small className="text-muted d-block mt-1">
+                            ID Proyecto: {inc.idProyect || projectId}
+                          </small>
                         </div>
                       </div>
                     </Card.Body>
@@ -219,7 +236,9 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
               ))
             ) : (
               <Col>
-                <p className="text-muted text-center">No hay incidencias asignadas.</p>
+                <p className="text-muted text-center">
+                  No hay incidencias asignadas.
+                </p>
               </Col>
             )}
           </Row>
@@ -234,11 +253,12 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
             incidenceData={selectedIncidence}
             isLoading={isLoading}
             projectId={projectId}
+            incidenceTypes={incidenceTypes} // Pasamos el array de tipos al modal
           />
         </Accordion.Body>
       </Accordion.Item>
     </Accordion>
   );
-}
+};
 
 export default Incidence;

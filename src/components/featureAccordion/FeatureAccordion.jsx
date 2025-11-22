@@ -51,7 +51,31 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { nombre, descripcion, tareas, incidencias } = feature;
+  const { nombre, descripcion, tareas, incidencias, id } = feature;
+
+  // Función para verificar token
+  const verifyToken = () => {
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      return { isValid: false, message: "No hay token de autenticación" };
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
+      
+      if (isExpired) {
+        localStorage.removeItem("token");
+        return { isValid: false, message: "Token expirado" };
+      }
+      
+      return { isValid: true, token };
+    } catch (parseError) {
+      localStorage.removeItem("token");
+      return { isValid: false, message: "Token inválido" };
+    }
+  };
 
   const handleAddTask = () => {
     setSelectedFeature(feature);
@@ -65,51 +89,7 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
     setSelectedFeature(null);
   };
 
-  const handleSubmitTask = async (taskData) => {
-    setIsLoading(true);
-    try {
-      const taskPayload = {
-        idFunction: feature.id, 
-        taskName: taskData.nombre,
-        taskDescription: taskData.descripcion,
-        priority: taskData.prioridad || 0,
-        dateEnd: taskData.fechaFin || "2025-11-30" 
-      };
-
-      console.log("Enviando tarea:", taskPayload);
-
-      const response = await fetch('http://localhost:3001/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(taskPayload)
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al crear la tarea');
-      }
-
-      const result = await response.json();
-      console.log("Tarea creada exitosamente:", result);
-
-      handleCloseTaskModal();
-
-      if (onTaskAdded) {
-        onTaskAdded();
-      }
-
-      // Mostrar mensaje de éxito
-      alert('Tarea creada exitosamente');
-
-    } catch (error) {
-      console.error('Error al crear tarea:', error);
-      alert('Error al crear la tarea: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+ 
   const handleEditTask = (task) => {
     setSelectedTask(task);
     setShowModalTwo(true);
@@ -118,13 +98,28 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
   const handleDeleteTask = async (taskId) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
       try {
-        // Aquí iría la llamada DELETE a la API
-        const response = await fetch(`http://localhost:3001/tasks/${taskId}`, {
-          method: 'DELETE'
+        // Verificar token antes de hacer la petición
+        const tokenValidation = verifyToken();
+        if (!tokenValidation.isValid) {
+          throw new Error(tokenValidation.message);
+        }
+
+        const response = await fetch(`http://localhost:5111/api/Task/${taskId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${tokenValidation.token}`
+          }
         });
 
+        // Manejar error 401
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        }
+
         if (!response.ok) {
-          throw new Error('Error al eliminar la tarea');
+          const errorText = await response.text();
+          throw new Error(`Error ${response.status}: ${errorText || response.statusText}`);
         }
 
         // Notificar al componente padre
@@ -135,18 +130,72 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
         alert('Tarea eliminada exitosamente');
       } catch (error) {
         console.error('Error al eliminar tarea:', error);
-        alert('Error al eliminar la tarea: ' + error.message);
+        
+        if (error.message.includes("sesión") || error.message.includes("token")) {
+          alert(`Error de autenticación: ${error.message}`);
+        } else {
+          alert('Error al eliminar la tarea: ' + error.message);
+        }
       }
     }
   };
 
+  // Función para actualizar tarea (si necesitas implementar PUT)
+  const handleUpdateTask = async (taskId, taskData) => {
+    try {
+      const tokenValidation = verifyToken();
+      if (!tokenValidation.isValid) {
+        throw new Error(tokenValidation.message);
+      }
+
+      const updatePayload = {
+        idFunction: feature.id,
+        taskName: taskData.nombre,
+        taskDescription: taskData.descripcion,
+        priority: taskData.prioridad || 0,
+        dateEnd: taskData.fechaFin,
+        resourceList: taskData.resourceList || []
+      };
+
+      const response = await fetch(`http://localhost:5111/api/Task/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenValidation.token}`
+        },
+        body: JSON.stringify(updatePayload)
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        throw new Error("Sesión expirada");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+
+      if (onTaskAdded) {
+        onTaskAdded();
+      }
+
+      alert('Tarea actualizada exitosamente');
+    } catch (error) {
+      console.error('Error al actualizar tarea:', error);
+      alert('Error al actualizar la tarea: ' + error.message);
+    }
+  };
+
   return (
-    <Accordion.Item  eventKey={eventKey} className="feature-accordion-item">
+    <Accordion.Item eventKey={eventKey} className="feature-accordion-item">
       <Accordion.Header>
         <Row className="w-100">
           <Col>
             <div className="feature-header-content">
               <h5 className="mb-0">{nombre}</h5>
+              <Badge bg="secondary" className="ms-2">
+                ID: {id}
+              </Badge>
             </div>
             <Row className="pt-2">
               <Col>
@@ -166,7 +215,7 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
             <h5 className="mb-0">
               Tareas 
               <Badge bg="light" text="dark" className="ms-2">
-                {tareas.length}
+                {tareas ? tareas.length : 0}
               </Badge>
             </h5>
             <Button
@@ -182,34 +231,41 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
         </div>
 
         <ListGroup variant="flush" className="mb-4">
-          {tareas.length > 0 ? (
+          {tareas && tareas.length > 0 ? (
             tareas.map((task) => (
               <ListGroup.Item key={task.id} className="task-item py-3">
                 <div className="d-flex justify-content-between align-items-start">
                   <div className="flex-grow-1">
                     <div className="d-flex align-items-center mb-2">
-                      <strong className="me-2">{task.nombre}</strong>
-                      <Badge bg={getStatusBadge(task.estado)}>
-                        {task.estado}
+                      <strong className="me-2">{task.nombre || task.taskName}</strong>
+                      <Badge bg={getStatusBadge(task.estado || task.taskState)}>
+                        {task.estado || task.taskState || "Pendiente"}
                       </Badge>
-                      {task.prioridad !== undefined && (
+                      {(task.prioridad !== undefined || task.priority !== undefined) && (
                         <Badge bg="outline-secondary" className="ms-1">
-                          Prio: {task.prioridad}
+                          Prio: {task.prioridad || task.priority}
                         </Badge>
                       )}
                     </div>
                     <small className="text-muted d-block mb-2">
-                      {task.descripcion}
+                      {task.descripcion || task.taskDescription}
                     </small>
-                    {(task.fechaInicio || task.fechaFin) && (
+                    {(task.fechaInicio || task.fechaFin || task.dateEnd) && (
                       <div className="task-dates">
                         <small className="text-muted">
                           {task.fechaInicio && task.fechaInicio !== "0001-01-01" && (
                             <>Inicio: {new Date(task.fechaInicio).toLocaleDateString()}</>
                           )}
-                          {task.fechaFin && (
-                            <> | Fin: {new Date(task.fechaFin).toLocaleDateString()}</>
+                          {(task.fechaFin || task.dateEnd) && (
+                            <> | Fin: {new Date(task.fechaFin || task.dateEnd).toLocaleDateString()}</>
                           )}
+                        </small>
+                      </div>
+                    )}
+                    {task.resourceList && task.resourceList.length > 0 && (
+                      <div className="task-resources mt-1">
+                        <small className="text-muted">
+                          Recursos: {task.resourceList.join(', ')}
                         </small>
                       </div>
                     )}
@@ -242,16 +298,13 @@ const FeatureAccordion = ({ feature, eventKey, onTaskAdded }) => {
             </ListGroup.Item>
           )}
         </ListGroup>
-
-
       </Accordion.Body>
 
       {/* Modales */}
       <CreateTaskModal
         show={showModalTwo}
         onHide={handleCloseTaskModal}
-        onSubmit={handleSubmitTask}
-        idFunction={feature.id} // Pasamos el ID de la funcionalidad
+        idFunction={feature.id}
         taskData={selectedTask}
         isLoading={isLoading}
       />

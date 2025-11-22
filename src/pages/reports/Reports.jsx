@@ -12,87 +12,122 @@ import {
 import "./reports.css";
 
 const Reports = () => {
-  const [reportData, setReportData] = useState({
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [metrics, setMetrics] = useState({
     activeProjects: 0,
-    completedRate: 0,
-    teamMembers: 0,
-    workedHours: 0,
+    completedProjects: 0,
+    avgProgress: 0,
+    totalTeams: 0,
   });
 
-  const [activityData, setActivityData] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
-  // Simulación de "fetch" desde API
   useEffect(() => {
-    const simulatedAPIResponse = {
-      activeProjects: 12,
-      completedRate: 87,
-      teamMembers: 24,
-      workedHours: 1248,
-      activitySummary: [
-        { mes: "Enero", horas: 900 },
-        { mes: "Febrero", horas: 1100 },
-        { mes: "Marzo", horas: 980 },
-        { mes: "Abril", horas: 1200 },
-        { mes: "Mayo", horas: 1250 },
-        { mes: "Junio", horas: 1000 },
-        { mes: "Julio", horas: 1300 },
-        { mes: "Agosto", horas: 1248 },
-        { mes: "Septiembre", horas: 1350 },
-        { mes: "Octubre", horas: 1420 },
-      ],
+    const fetchReports = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/projectsWithProgress");
+        const data = await res.json();
+
+        const projectsList = data.projectsWithProgress || [];
+        setProjects(projectsList);
+
+        // 📌 Calcular métricas
+        let active = 0;
+        let completed = 0;
+        let progressSum = 0;
+        let totalTeams = 0;
+
+        const chart = projectsList.map((p) => {
+          const proj = p.projectData;
+
+          if (proj.stateProject === "In_Progress") active++;
+          if (proj.stateProject === "Completed") completed++;
+
+          progressSum += p.progressPorcentage;
+          totalTeams += proj.teamNumber;
+
+          return {
+            name: proj.nameProject,
+            progress: p.progressPorcentage,
+          };
+        });
+
+        setMetrics({
+          activeProjects: active,
+          completedProjects: completed,
+          avgProgress:
+            projectsList.length > 0
+              ? (progressSum / projectsList.length).toFixed(1)
+              : 0,
+          totalTeams,
+        });
+
+        setChartData(chart);
+      } catch (err) {
+        console.error("Error obteniendo reportes:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // Simular un retardo de red
-    setTimeout(() => {
-      setReportData({
-        activeProjects: simulatedAPIResponse.activeProjects,
-        completedRate: simulatedAPIResponse.completedRate,
-        teamMembers: simulatedAPIResponse.teamMembers,
-        workedHours: simulatedAPIResponse.workedHours,
-      });
-
-      setActivityData(simulatedAPIResponse.activitySummary);
-    }, 800);
+    fetchReports();
   }, []);
-  return (
-     <div className="reports-container">
-      <h1>Reportes</h1>
 
-      {/* 🔹 Tarjetas métricas */}
+  if (loading) return <h2>Cargando reportes...</h2>;
+
+  return (
+    <div className="reports-container">
+      <h1>Reportes de Proyecto</h1>
+
+      {/* 🔹 TARJETAS DE MÉTRICAS */}
       <div className="reports-cards">
         <div className="report-card">
           <FileText className="card-icon" size={32} />
           <h3>Proyectos Activos</h3>
-          <h2>{reportData.activeProjects}</h2>
-          <p>+3 este mes</p>
+          <h2>{metrics.activeProjects}</h2>
+          <p>Actualmente en curso</p>
         </div>
 
         <div className="report-card">
           <TrendingUp className="card-icon" size={32} />
-          <h3>Tasa de Completado</h3>
-          <h2>{reportData.completedRate}%</h2>
-          <p>+5% vs mes anterior</p>
+          <h3>Progreso Promedio</h3>
+          <h2>{metrics.avgProgress}%</h2>
+          <p>Entre todos los proyectos</p>
         </div>
 
         <div className="report-card">
           <Users className="card-icon" size={32} />
-          <h3>Miembros del Equipo</h3>
-          <h2>{reportData.teamMembers}</h2>
-          <p>+2 nuevos</p>
+          <h3>Equipos Totales Asignados</h3>
+          <h2>{metrics.totalTeams}</h2>
+          <p>Suma de teamNumber</p>
         </div>
 
         <div className="report-card">
           <Clock className="card-icon" size={32} />
-          <h3>Horas Trabajadas</h3>
-          <h2>{reportData.workedHours.toLocaleString()}</h2>
-          <p>Este mes</p>
+          <h3>Proyectos Finalizados</h3>
+          <h2>{metrics.completedProjects}</h2>
+          <p>Marcados como Completed</p>
         </div>
       </div>
 
-      {/* 🔹 Gráfico de actividad */}
-      
-    </div>
-  )
-}
+      {/* 🔹 GRÁFICO DE BARRAS */}
+      <div className="chart-container">
+        <h2>Progreso por Proyecto</h2>
 
-export default Reports
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis domain={[0, 100]} />
+            <Tooltip />
+            <Bar dataKey="progress" fill="#4f46e5" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
+
+export default Reports;

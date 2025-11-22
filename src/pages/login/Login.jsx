@@ -1,85 +1,139 @@
-import React, { useState } from 'react';
-import { Container, Card, Form, Button } from 'react-bootstrap';
-import { FaUser, FaLock, FaRegUser, FaDumbbell } from 'react-icons/fa'; // Agregamos FaDumbbell
-import { useNavigate } from 'react-router-dom';
-import '../login/login.css'
+import React, { useState, useContext } from "react";
+import { Container, Card, Form, Button, InputGroup } from "react-bootstrap";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaDumbbell, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import "./login.css";
+import { AuthContext } from "../../components/authContext/AuthContext";
 
 const Login = () => {
-   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Usuario:', username, 'Contraseña:', password);
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    // Aquí iría tu lógica de autenticación real (llamada a API, etc.)
-    // Por ahora, simulamos un login exitoso y redirigimos
-    if (username === 'test' && password === 'password') {
-      alert('¡Login exitoso!');
-      // Redirige al usuario a la página principal después del login
-      navigate('/'); 
-    } else {
-      alert('Usuario o contraseña incorrectos');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:5111/api/Auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userName, password }),
+      });
+
+      if (!res.ok) {
+        setErrorMsg("Credenciales incorrectas");
+        setLoading(false);
+        return;
+      }
+
+      const data = await res.json();
+      const employee = data.employee?.employeeAuthenticated;
+
+      if (!employee || !data.token) {
+        setErrorMsg("Respuesta inválida del servidor");
+        setLoading(false);
+        return;
+      }
+
+      login(employee, data.token);
+      navigate("/");
+    } catch (error) {
+      setErrorMsg("Error conectando al servidor");
+    } finally {
+      setLoading(false);
     }
   };
-  return (
-      <div className="login-page-container"> {/* Contenedor para el fondo y centrado */}
-      <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Card className="login-card shadow p-4 w-100"> {/* Card con sombra y padding */}
-          <Card.Body className="text-center">
-            
-            {/* Logo o Icono Principal - AHORA CON PESA */}
-            <div className="login-logo-container mb-3">
-              <div className="login-logo-icon">
-                <FaDumbbell className="dumbbell-icon" style={{ fontSize: '3rem', color: '#ffffffff' }} />
-              </div>
-            </div>
-            <Card.Title className="mb-4">GYM Software</Card.Title>
-            <h4 className="mb-4">Iniciar Sesión</h4>
 
-            {/* Formulario de Login */}
+  return (
+    <div className="login-page-container">
+      <Container className="d-flex justify-content-center align-items-center min-vh-100">
+        <Card className="login-card shadow p-4 w-50">
+          <Card.Body className="text-center">
+
+            {/* ICONO PRINCIPAL */}
+            <div className="login-icon-wrapper mb-3">
+              <FaDumbbell className="login-main-icon" />
+            </div>
+
+            <h2 className="login-title">Iniciar Sesión</h2>
+            <p className="login-subtitle mb-4">Ingresa tus credenciales para acceder</p>
+
             <Form onSubmit={handleLogin}>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Usuario</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  placeholder="Ingresa tu usuario" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+
+              {/* USUARIO */}
+              <Form.Label className="text-start w-100">Usuario</Form.Label>
+              <InputGroup className="mb-3">
+                <InputGroup.Text>
+                  <FaUser />
+                </InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  placeholder="tu@ejemplo.com"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   required
                 />
-              </Form.Group>
+              </InputGroup>
 
-              <Form.Group className="mb-4" controlId="formBasicPassword">
-                <Form.Label>Contraseña</Form.Label>
-                <Form.Control 
-                  type="password" 
-                  placeholder="Ingresa tu contraseña" 
+              {/* CONTRASEÑA */}
+              <Form.Label className="text-start w-100">Contraseña</Form.Label>
+              <InputGroup className="mb-3">
+                <InputGroup.Text>
+                  <FaLock />
+                </InputGroup.Text>
+                <Form.Control
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ingresa tu contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-              </Form.Group>
+                <InputGroup.Text
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </InputGroup.Text>
+              </InputGroup>
 
-              <Button variant="primary" type="submit" className="w-100 mb-3">
-                Iniciar Sesión
+              {/* ERROR */}
+              {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
+
+              {/* BOTÓN */}
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100 mb-3 button-login"
+                disabled={loading}
+              >
+                {loading ? "Verificando..." : "Iniciar Sesión"}
               </Button>
             </Form>
 
-            {/* Enlace de Registro */}
-            <div className="mt-4">
-              <p className="small-text-login">
-                <FaRegUser className="me-1" /> {/* Icono de persona para "Registrate" */}
-                <a href="/register">¿No Tienes cuenta? Regístrate!</a>
-              </p>
-            </div>
-
+            {/* REGISTRO */}
+            <p className="mt-3 small-text-login">
+              Admin: Admin | Admin123
+            </p>
+            <p>
+              Manager: sofia9 | Sofia123
+            </p>
+            <p>
+             Developer: martin10 | Martin123
+            </p>
           </Card.Body>
         </Card>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
+
+

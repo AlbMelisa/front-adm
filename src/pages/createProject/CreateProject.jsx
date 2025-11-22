@@ -16,39 +16,73 @@ const defaultValues = {
   functions: [],
 };
 
-const CreateProject = (values = defaultValues) => {
+const CreateProject = () => {
   const [clientesList, setClientesList] = useState([]);
-  const [team,setTeam]= useState([]);
+  const [team, setTeam] = useState([]);
   const navigate = useNavigate();
 
+  // 1. Cargar Clientes (Con Token y corrección de error)
+// 1. Cargar Clientes
+ // 1. Cargar Clientes (DATOS PROVISORIOS ACTIVOS)
   useEffect(() => {
+
+
+    // C. Mantenemos la lógica de la API comentada para el futuro
     const fetchClients = async () => {
       try {
-        const res = await fetch("http://localhost:3001/clientsRegistered");
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:5111/api/Clients/getAll", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
 
         if (!res.ok) throw new Error("Error al obtener clientes");
 
         const data = await res.json();
-        setClientesList(data);
+        
+        if (data.clientsRegistered) {
+             setClientesList(data.clientsRegistered);
+        } else {
+             setClientesList([]);
+        }
+
       } catch (err) {
-        setClientsError(err.message);
+        console.error("Error cargando clientes:", err.message);
       } 
     };
 
-    fetchClients();
+    fetchClients(); 
+    
   }, []);
 
+  // 2. Cargar Equipos (Con Token y corrección de error)
+  // 2. Cargar Equipos
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const res = await fetch("http://localhost:3001/teamsRegistered");
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:5111/api/Teams", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
 
         if (!res.ok) throw new Error("Error al obtener team");
 
         const data = await res.json();
-        setTeam(data);
+        
+        // --- CAMBIO AQUÍ ---
+        // Antes tenías: setTeam(data); 
+        // Ahora debes acceder a la propiedad que tiene el array:
+        if (data.teamsRegistered) {
+            setTeam(data.teamsRegistered);
+        } else {
+            setTeam([]); // Por seguridad, si viene vacío
+        }
+
       } catch (err) {
-        setTeamError(err.message);
+        console.error("Error cargando equipos:", err.message);
       } 
     };
 
@@ -61,7 +95,7 @@ const CreateProject = (values = defaultValues) => {
     control,
     formState: { errors },
   } = useForm({
-    defaultValues: values,
+    defaultValues: defaultValues,
     mode: "all",
   });
 
@@ -77,34 +111,51 @@ const CreateProject = (values = defaultValues) => {
     return `${year}-${month}-${day}T00:00:00`;
   };
 
-  const onSubmit = async (data) => {
-    const endpoint = "http://localhost:3001/Projects";
+  // 3. Submit (Con Token)
+// 3. Submit (Con Token)
+  const onSubmit = async (formData) => {
+    const endpoint = "http://localhost:5111/api/Projects";
 
-    // Convertimos FECHA
-    if (data.dataEnd) {
-      data.dataEnd = convertDate(data.dataEnd);
-    }
-
+    const payload = {
+      idClient: parseInt(formData.clientName),
+      idTeam: parseInt(formData.teamNumber),
+      nameProject: formData.nameProject,
+      typeProject: formData.typeProject,
+      descriptionProject: formData.descriptionProject,
+      // Asegúrate de que convertDate maneje bien la fecha o usa null
+      dataEnd: formData.dataEnd ? convertDate(formData.dataEnd) : null,
+      priorityProject: parseInt(formData.priorityProject),
+      budgetProject: parseFloat(formData.budgetProject),
+      functions: formData.functions
+    };
+    console.log(payload)
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
       });
+      console.log("TOKEN:", token);
 
       if (!response.ok) {
         let msg = `Error ${response.status}`;
         try {
           const err = await response.json();
           if (err.message) msg = err.message;
+          else if (err.title) msg = err.title;
         } catch {}
         throw new Error(msg);
       }
 
-      await response.json();
       alert("¡Proyecto creado exitosamente!");
       navigate("/projectslist");
+
     } catch (err) {
+      console.error(err);
       alert("Error al crear proyecto: " + err.message);
     }
   };
@@ -148,7 +199,7 @@ const CreateProject = (values = defaultValues) => {
               >
                 <option value="">Seleccione el equipo...</option>
                 {team.map((r) => (
-                  <option key={r.numberTeam} value={r.numberTeam}>
+                  <option key={r.idTeam} value={r.idTeam}>
                     {r.numberTeam}
                   </option>
                 ))}
@@ -262,7 +313,7 @@ const CreateProject = (values = defaultValues) => {
               >
                 <option value="">Seleccione el cliente</option>
                 {clientesList.map((c) => (
-                  <option key={c.dniClient} value={c.fullNameClient}>
+                  <option key={c.idClient} value={c.idClient}>
                     {c.fullNameClient}
                   </option>
                 ))}

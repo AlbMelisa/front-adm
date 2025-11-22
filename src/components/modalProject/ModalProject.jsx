@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Card, Badge } from "react-bootstrap";
+import { Modal, Button, Form, Card, Alert } from "react-bootstrap";
 
 const ModalProject = ({ show, handleClose, project }) => {
-  // const [budget, setBudget] = useState(0);
-  // const [funcionalidades, setFuncionalidades] = useState([]);
   const [budget, setBudget] = useState(0);
   const [description, setDescription] = useState("");
   const [dateEnd, setDateEnd] = useState("");
-  const [funcionalidades, setFuncionalidades] = useState([]);
   const [changeReason, setChangeReason] = useState("");
   const [nuevasFunciones, setNuevasFunciones] = useState([]);
   const [showNueva, setShowNueva] = useState(false);
   const [nuevaFunc, setNuevaFunc] = useState({ nombre: "", descripcion: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-
- useEffect(() => {
+  useEffect(() => {
     if (project) {
       setBudget(project.budgetProject || 0);
       setDescription(project.descriptionProject || "");
-      setDateEnd(project.dateEnd?.slice(0, 10) || "");
+      // Formatear la fecha para el input type="date"
+      const formattedDate = project.dateEnd && project.dateEnd !== "0001-01-01" 
+        ? project.dateEnd.slice(0, 10) 
+        : "";
+      setDateEnd(formattedDate);
+      setNuevasFunciones([]); // Resetear nuevas funciones al abrir el modal
+      setChangeReason(""); // Resetear razón del cambio
+      setError(""); // Limpiar errores
+      setSuccess(""); // Limpiar mensajes de éxito
     }
-  }, [project]);
+  }, [project, show]);
 
   const agregarFuncionalidad = () => {
-    if (!nuevaFunc.nombre.trim()) return;
+    if (!nuevaFunc.nombre.trim()) {
+      setError("El nombre de la funcionalidad es requerido");
+      return;
+    }
 
     setNuevasFunciones([
       ...nuevasFunciones,
@@ -35,33 +45,94 @@ const ModalProject = ({ show, handleClose, project }) => {
 
     setNuevaFunc({ nombre: "", descripcion: "" });
     setShowNueva(false);
+    setError("");
+  };
+
+  const eliminarFuncionalidad = (index) => {
+    const nuevas = [...nuevasFunciones];
+    nuevas.splice(index, 1);
+    setNuevasFunciones(nuevas);
   };
 
   const handleGuardarCambios = async () => {
-    const payload = {
-      idProject: project.idProject,
-      newDescriptionProject: description,
-      newBudgetProject: Number(budget),
-      dateEnd: dateEnd,
-      changeReason: changeReason,
-      newFunctions: nuevasFunciones,
-    };
+    // Validaciones
+    if (!changeReason.trim()) {
+      setError("La razón del cambio es requerida");
+      return;
+    }
 
-    console.log("PATCH /projects =>", payload);
+    if (!dateEnd) {
+      setError("La fecha de finalización es requerida");
+      return;
+    }
 
-    await fetch(`http://localhost:3001/projects/${project.idProject}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
-    handleClose();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No hay token de autenticación");
+      }
+
+      const payload = {
+        idProject: project.idProject,
+        newDescriptionProject: description,
+        newBudgetProject: Number(budget),
+        dateEnd: dateEnd,
+        changeReason: changeReason,
+        newFunctions: nuevasFunciones,
+      };
+
+      console.log("📤 Enviando PATCH a /api/Projects/updateProyect:", payload);
+
+      const response = await fetch("http://localhost:5111/api/Projects/updateProyect", {
+        method: "PATCH",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log("📡 Respuesta del servidor:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ Proyecto actualizado:", result);
+
+      setSuccess("Proyecto actualizado correctamente");
+      
+      // Cerrar modal después de 2 segundos
+      setTimeout(() => {
+        handleClose(true); // Indicar que se actualizó correctamente
+      }, 2000);
+
+    } catch (err) {
+      console.error("❌ Error al actualizar proyecto:", err);
+      setError(err.message || "Error al actualizar el proyecto");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setError("");
+    setSuccess("");
+    setNuevasFunciones([]);
+    setChangeReason("");
+    handleClose(false);
   };
 
   return (
     <Modal
       show={show}
-      onHide={handleClose}
+      onHide={handleCloseModal}
       size="lg"
       centered
       backdrop="static"
@@ -71,154 +142,188 @@ const ModalProject = ({ show, handleClose, project }) => {
       </Modal.Header>
 
       <Modal.Body>
+        {/* Mensajes de alerta */}
+        {error && <Alert variant="danger">{error}</Alert>}
+        {success && <Alert variant="success">{success}</Alert>}
 
         {/* Información del Proyecto */}
         <div className="p-3 mb-4 bg-light rounded">
           <div className="row">
             <div className="col-md-6">
               <p><strong>Nombre:</strong> {project?.nameProject}</p>
-              <p><strong>Cliente:</strong> {project?.clientName}</p>
-              <p><strong>Fecha Inicio:</strong> {project?.dataInitial?.slice(0,10)}</p>
+              <p><strong>Cliente:</strong> {project?.client?.fullNameClient || project?.clientName}</p>
+              <p><strong>Fecha Inicio:</strong> {project?.dateInitial?.slice(0,10)}</p>
             </div>
             <div className="col-md-6">
               <p><strong>ID Proyecto:</strong> {project?.idProject}</p>
-              <p><strong>ID Equipo:</strong> {project?.teamNumber}</p>
+              <p><strong>Equipo:</strong> {project?.team?.numberTeam || project?.teamNumber}</p>
+              <p><strong>Estado:</strong> {project?.stateProject}</p>
             </div>
           </div>
         </div>
-        <Form.Group className="mb-4">
-          <Form.Label>Descripción</Form.Label>
+
+        {/* Descripción */}
+        <Form.Group className="mb-3">
+          <Form.Label>Descripción del Proyecto</Form.Label>
           <Form.Control
             as="textarea"
+            rows={3}
             value={description}
-            onChange={(e) => setBudget(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe el proyecto..."
           />
         </Form.Group>
+
         {/* Presupuesto */}
-        <Form.Group className="mb-4">
-          <Form.Label>Presupuesto del Proyecto</Form.Label>
+        <Form.Group className="mb-3">
+          <Form.Label>Presupuesto del Proyecto ($)</Form.Label>
           <Form.Control
             type="number"
+            step="0.01"
             value={budget}
             onChange={(e) => setBudget(e.target.value)}
           />
         </Form.Group>
 
-        {/* Funcionalidades */}
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <h5>Funcionalidades del Proyecto</h5>
-          <Button variant="outline-dark" size="sm" onClick={() => setShowNueva(true)}>
+        {/* Fecha de Finalización */}
+        <Form.Group className="mb-3">
+          <Form.Label>Fecha de Finalización</Form.Label>
+          <Form.Control
+            type="date"
+            value={dateEnd}
+            onChange={(e) => setDateEnd(e.target.value)}
+          />
+        </Form.Group>
+
+        {/* Razón del Cambio */}
+        <Form.Group className="mb-3">
+          <Form.Label>Razón del Cambio *</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={2}
+            value={changeReason}
+            onChange={(e) => setChangeReason(e.target.value)}
+            placeholder="Explica por qué se realizan estos cambios..."
+            required
+          />
+          <Form.Text className="text-muted">
+            Este campo es obligatorio para realizar cualquier modificación.
+          </Form.Text>
+        </Form.Group>
+
+        {/* Nuevas Funcionalidades */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5>Nuevas Funcionalidades</h5>
+          <Button 
+            variant="outline-primary" 
+            size="sm" 
+            onClick={() => setShowNueva(true)}
+            disabled={loading}
+          >
             + Agregar Nueva
           </Button>
         </div>
 
-        {funcionalidades.map((f) => (
-          <Card key={f.id} className="p-3 mb-3 shadow-sm w-100">
-            <div className="d-flex justify-content-between">
-              <div className="w-75">
-                <h6 className="mb-1">{f.functionName}</h6>
-                <p className="text-muted mb-1" style={{ fontSize: "0.9rem" }}>
-                  {f.functionDescription}
-                </p>
-
-                {/* {editandoId === f.id ? (
-                  <>
-                    <Form.Control
-                      className="mb-2"
-                      value={formEdit.nombre}
-                      onChange={(e) =>
-                        setFormEdit({ ...formEdit, nombre: e.target.value })
-                      }
-                    />
-
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      value={formEdit.descripcion}
-                      onChange={(e) =>
-                        setFormEdit({ ...formEdit, descripcion: e.target.value })
-                      }
-                    />
-                  </>
-                ) : ( */}
-                  <>
-
-                    
-                  </>
-                {/* )} */}
+        {/* Lista de nuevas funcionalidades agregadas */}
+        {nuevasFunciones.map((func, index) => (
+          <Card key={index} className="p-3 mb-2 shadow-sm">
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="flex-grow-1">
+                <h6 className="mb-1">{func.functionName}</h6>
+                <p className="text-muted mb-0 small">{func.functionDescription}</p>
               </div>
-
-              {/* <div className="d-flex flex-column gap-2">
-                {editandoId === f.id ? (
-                  <Button variant="outline-success" size="sm" onClick={guardarEdicion}>
-                    💾
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline-dark"
-                    size="sm"
-                    onClick={() => activarEdicion(f)}
-                  >
-                    ✏️
-                  </Button>
-                )}
-
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => borrarFuncionalidad(f.id)}
-                >
-                  🗑️
-                </Button>
-              </div> */}
+              <Button
+                variant="outline-danger"
+                size="sm"
+                onClick={() => eliminarFuncionalidad(index)}
+                disabled={loading}
+              >
+                🗑️
+              </Button>
             </div>
           </Card>
         ))}
 
-        {/* Modal Nueva Funcionalidad */}
+        {nuevasFunciones.length === 0 && (
+          <p className="text-muted text-center mb-3">
+            No se han agregado nuevas funcionalidades
+          </p>
+        )}
+
+        {/* Modal para agregar nueva funcionalidad */}
         {showNueva && (
-          <Card className="p-3 mt-3 shadow-sm w-100">
+          <Card className="p-3 mt-3 shadow">
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">Nueva Funcionalidad</h6>
-              <Button size="sm" variant="outline-dark" onClick={() => setShowNueva(false)}>
+              <Button 
+                size="sm" 
+                variant="outline-secondary" 
+                onClick={() => {
+                  setShowNueva(false);
+                  setNuevaFunc({ nombre: "", descripcion: "" });
+                }}
+              >
                 ✕
               </Button>
             </div>
 
-            <Form.Control
-              className="mb-2"
-              placeholder="Nombre de la funcionalidad"
-              value={nuevaFunc.nombre}
-              onChange={(e) =>
-                setNuevaFunc({ ...nuevaFunc, nombre: e.target.value })
-              }
-            />
+            <Form.Group className="mb-2">
+              <Form.Label>Nombre de la funcionalidad *</Form.Label>
+              <Form.Control
+                placeholder="Ej: Gestión de sponsors"
+                value={nuevaFunc.nombre}
+                onChange={(e) => setNuevaFunc({ ...nuevaFunc, nombre: e.target.value })}
+              />
+            </Form.Group>
 
-            <Form.Control
-              as="textarea"
-              rows={3}
-              className="mb-3"
-              placeholder="Descripción detallada"
-              value={nuevaFunc.descripcion}
-              onChange={(e) =>
-                setNuevaFunc({ ...nuevaFunc, descripcion: e.target.value })
-              }
-            />
+            <Form.Group className="mb-3">
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Describe la funcionalidad..."
+                value={nuevaFunc.descripcion}
+                onChange={(e) => setNuevaFunc({ ...nuevaFunc, descripcion: e.target.value })}
+              />
+            </Form.Group>
 
-            <Button variant="dark" onClick={agregarFuncionalidad}>
-              Guardar Funcionalidad
-            </Button>
+            <div className="d-flex gap-2">
+              <Button 
+                variant="primary" 
+                onClick={agregarFuncionalidad}
+                disabled={!nuevaFunc.nombre.trim()}
+              >
+                Guardar Funcionalidad
+              </Button>
+              <Button 
+                variant="outline-secondary" 
+                onClick={() => {
+                  setShowNueva(false);
+                  setNuevaFunc({ nombre: "", descripcion: "" });
+                }}
+              >
+                Cancelar
+              </Button>
+            </div>
           </Card>
         )}
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button 
+          variant="secondary" 
+          onClick={handleCloseModal}
+          disabled={loading}
+        >
           Cancelar
         </Button>
 
-        <Button variant="dark" onClick={handleGuardarCambios}>
-          Guardar Cambios
+        <Button 
+          variant="primary" 
+          onClick={handleGuardarCambios}
+          disabled={loading || !changeReason.trim() || !dateEnd}
+        >
+          {loading ? "Guardando..." : "Guardar Cambios"}
         </Button>
       </Modal.Footer>
     </Modal>

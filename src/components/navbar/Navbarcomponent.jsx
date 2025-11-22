@@ -1,12 +1,40 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react"; // Agregamos useEffect y useState
 import { Navbar, Container } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-// 1. Importamos el ícono del gimnasio
-// import { FaDumbbell } from "react-icons/fa"; // <-- Otra buena alternativa
 import "./navbarcomponent.css";
+import { AuthContext } from "../authContext/AuthContext";
 
-const Navbarcomponent = ({ userName = "Usuario", rol = "Administrador", onLogout }) => {
+const Navbarcomponent = () => {
+  const { logout } = useContext(AuthContext);
+  
+  // Estado local para guardar los datos del usuario
+  const [userData, setUserData] = useState({
+    nombre: "Usuario",
+    rol: "Invitado"
+  });
+
+  useEffect(() => {
+    // 1. Buscamos el item 'user' que mostraste en la imagen
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        // 2. Convertimos el texto JSON a un objeto de JavaScript
+        const parsedUser = JSON.parse(storedUser);
+
+        // 3. Actualizamos el estado con los nombres exactos de TU base de datos
+        // Según tu imagen: nameEmployee y rolEmployee
+        setUserData({
+          nombre: parsedUser.nameEmployee, 
+          rol: parsedUser.rolEmployee
+        });
+      } catch (error) {
+        console.error("Error al leer datos del usuario", error);
+      }
+    }
+  }, []);
+
   return (
     <Navbar className="navbar-gym" expand="lg">
       <Container
@@ -15,17 +43,15 @@ const Navbarcomponent = ({ userName = "Usuario", rol = "Administrador", onLogout
       >
         {/* IZQUIERDA: LOGO + TITULO */}
         <div className="navbar-left d-flex align-items-center">
-        
           <div className="navbar-title">
             <h6 className="title">GYM SOFTWARE</h6>
             <span className="subtitle">Sistema de gestión</span>
           </div>
         </div>
 
-        {/* CENTRO VACIO PARA MANTENER ESPACIO (opcional) */}
         <div className="navbar-center" />
 
-        {/* DERECHA: CAJITA DE USUARIO + LOGOUT */}
+        {/* DERECHA */}
         <div className="navbar-right d-flex align-items-center">
           <div className="navbar-user-box d-flex align-items-center">
             <div className="avatar-circle">
@@ -33,17 +59,15 @@ const Navbarcomponent = ({ userName = "Usuario", rol = "Administrador", onLogout
             </div>
 
             <div className="user-info">
-              <span className="user-name">Bienvenido {userName}</span>
-              <span className="user-role">{rol}</span>
+              {/* AQUI USAMOS LAS VARIABLES DEL ESTADO */}
+              <span className="user-name mb-2">Bienvenido {userData.nombre}</span>
+              <span className="user-role">{userData.rol}</span>
             </div>
           </div>
 
-          {/* icono de salida separado */}
           <button
             className="logout-button"
-            onClick={() => {
-              if (onLogout) onLogout();
-            }}
+            onClick={logout}
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
           >

@@ -8,10 +8,8 @@ import "./features.css";
 
 const Feature = ({ project, onTaskAdded }) => {
   const [features, setFeatures] = useState([]);
-
   useEffect(() => {
     if (!project || !project.functions) return;
-    console.log("Llega a Feature:", project);
     
     // Convertir datos de la API a tu estructura
     const mappedFeatures = project.functions.map((func, index) => ({
