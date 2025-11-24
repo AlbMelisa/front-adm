@@ -3,6 +3,7 @@ import { Accordion, Button, Badge, Card, Row, Col } from "react-bootstrap";
 import { BsPlusLg } from "react-icons/bs";
 import IncidentModal from "../incidentModal/IncidentModal";
 import "../incidentModal/incidentModal.css";
+import { useId } from "react";
 
 const getBadgeBg = (tipo) => {
   switch (tipo) {
@@ -38,6 +39,8 @@ const getStatusBadge = (estado) => {
 const incidenceTypes = ["Humano", "Tecnológico", "Material", "Recursos"];
 
 const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
+  const rowId = useId();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedIncidence, setSelectedIncidence] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -182,8 +185,10 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
 
           <Row className="mb-4">
             {incidences && incidences.length > 0 ? (
-              incidences.map((inc) => (
-                <Col md={6} key={inc.id || inc.idIncidence} className="mb-3">
+              incidences.map((inc, index) => (
+                <Col md={6} 
+                     key={`${rowId}-incidence-${inc.id || inc.idIncidence || index}`} 
+                     className="mb-3">
                   <Card className="item-card w-100">
                     <Card.Body>
                       <div className="d-flex justify-content-between align-items-start">

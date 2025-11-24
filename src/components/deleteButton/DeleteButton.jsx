@@ -4,22 +4,50 @@ import Modal from 'react-bootstrap/Modal';
 
 function DeleteButton({ idProject, projectName, onDelete }) {
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // Obtener el token del localStorage o sessionStorage
+  const getToken = () => {
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  };
+
+  // Headers con autorización
+  const getAuthHeaders = () => {
+    const token = getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
   const handleConfirmarBaja = async () => {
+    setLoading(true);
     try {
+      const token = getToken();
+      if (!token) {
+        alert("No se encontró token de autenticación");
+        return;
+      }
+
       const response = await fetch(
-        `http://localhost:3001/Projects/deleteProyect/${idProject}`,
+        `http://localhost:5111/api/Projects/deleteProject/${idProject}`,
         {
-          method: "DELETE",
-          // NO ES DELETE, TIENE QUE SER OTRO METODO
+          method: "PATCH",
+          headers: getAuthHeaders()
         }
       );
 
       if (!response.ok) {
-        throw new Error("Error al eliminar el proyecto");
+        if (response.status === 401) {
+          throw new Error("Token expirado o inválido");
+        }
+        if (response.status === 404) {
+          throw new Error("Proyecto no encontrado");
+        }
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
       // Avisamos al componente padre que el proyecto fue eliminado
@@ -27,14 +55,16 @@ function DeleteButton({ idProject, projectName, onDelete }) {
 
     } catch (error) {
       console.error("Error eliminando proyecto:", error);
+      alert(`Error al eliminar el proyecto: ${error.message}`);
     } finally {
+      setLoading(false);
       handleClose();
     }
   };
 
   return (
     <>
-      <div onClick={handleShow}>
+      <div onClick={handleShow} style={{ cursor: 'pointer' }}>
         Eliminar
       </div>
 
@@ -51,11 +81,22 @@ function DeleteButton({ idProject, projectName, onDelete }) {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleConfirmarBaja}>
-            Sí, eliminar
+          <Button 
+            variant="danger" 
+            onClick={handleConfirmarBaja}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Eliminando...
+              </>
+            ) : (
+              'Sí, eliminar'
+            )}
           </Button>
         </Modal.Footer>
       </Modal>

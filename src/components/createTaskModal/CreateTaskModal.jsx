@@ -7,29 +7,84 @@ import {
   Col,
   ToggleButtonGroup,
   ToggleButton,
-  InputGroup
+  InputGroup,
+  Alert
 } from "react-bootstrap";
-
+import { useForm } from "react-hook-form";
+import '../../pages/createProject/createProject.css'
 const priorityMapToApi = { Baja: 0, Media: 1, Alta: 2 };
 const priorityMapFromApi = { 0: "Baja", 1: "Media", 2: "Alta" };
 
-const CreateTaskModal = ({ show, onHide,idFunction, taskData, isLoading }) => {
+const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading }) => {
   const isEditMode = !!taskData;
-  const [taskName, setTaskName] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [dateEnd, setDateEnd] = useState("");
-  const [priority, setPriority] = useState("Media");
   const [allResources, setAllResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [assignedResources, setAssignedResources] = useState([]);
   const [resourcesError, setResourcesError] = useState(null);
   const [internalFunctionId, setInternalFunctionId] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-useEffect(() => {
-  if (show) {
-    setInternalFunctionId(idFunction);
-  }
-}, [show, idFunction]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue,
+    watch,
+    trigger,
+    clearErrors
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      taskName: "",
+      taskDescription: "",
+      dateEnd: "",
+      priority: "Media",
+      assignedResources: []
+    }
+  });
+
+  // Watch para contadores de caracteres
+  const watchTaskName = watch("taskName", "");
+  const watchTaskDescription = watch("taskDescription", "");
+  const watchAssignedResources = watch("assignedResources", []);
+
+  useEffect(() => {
+    if (show) {
+      setInternalFunctionId(idFunction);
+    }
+  }, [show, idFunction]);
+
+  // Validación personalizada para recursos asignados
+  const validateAssignedResources = (value) => {
+    if (!value || value.length === 0) {
+      return "Debe asignar al menos un recurso";
+    }
+    return true;
+  };
+
+  // Validación personalizada para fecha futura
+  const validateFutureDate = (value) => {
+    if (!value) {
+      return "La fecha límite es obligatoria";
+    }
+    
+    const selectedDate = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return "La fecha no puede ser anterior a hoy";
+    }
+    
+    return true;
+  };
+
+  const getMinDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   const verifyToken = () => {
     const token = localStorage.getItem("token");
     
@@ -52,7 +107,6 @@ useEffect(() => {
       return { isValid: false, message: "Token inválido" };
     }
   };
-
 
   const fetchResources = async () => {
     try {
@@ -80,7 +134,6 @@ useEffect(() => {
 
       const data = await resp.json();
       
-      // Normalizar datos
       let resourcesList = [];
       if (Array.isArray(data)) {
         resourcesList = data;
@@ -107,97 +160,101 @@ useEffect(() => {
       fetchResources();
 
       if (isEditMode && taskData) {
-        setTaskName(taskData.taskName || taskData.nombre || "");
-        setTaskDescription(taskData.taskDescription || taskData.descripcion || "");
+        setValue("taskName", taskData.taskName || taskData.nombre || "");
+        setValue("taskDescription", taskData.taskDescription || taskData.descripcion || "");
         
         let fDate = taskData.dateEnd || taskData.fechaFin || "";
         if(fDate && fDate.includes("T")) fDate = fDate.split("T")[0];
-        setDateEnd(fDate);
+        setValue("dateEnd", fDate);
 
-        setPriority(priorityMapFromApi[taskData.priority] || "Media");
+        setValue("priority", priorityMapFromApi[taskData.priority] || "Media");
 
         const resources = taskData.resourceList || taskData.resource || [];
         setAssignedResources(Array.isArray(resources) ? resources : []);
+        setValue("assignedResources", Array.isArray(resources) ? resources : []);
       } else {
         resetForm();
       }
     }
-  }, [show]); // <--- SOLO DEPENDE DE 'SHOW' PARA NO BORRAR LO QUE ESCRIBES
+  }, [show, isEditMode, taskData, setValue]);
 
-  // Reset form
   const resetForm = () => {
-    setTaskName("");
-    setTaskDescription("");
-    setDateEnd("");
-    setPriority("Media");
+    reset({
+      taskName: "",
+      taskDescription: "",
+      dateEnd: "",
+      priority: "Media",
+      assignedResources: []
+    });
     setAssignedResources([]);
-    if (allResources.length > 0) {
-        setSelectedResource(allResources[0].idResource);
-    }
     setResourcesError(null);
+    setShowSuccessAlert(false);
+    if (allResources.length > 0) {
+      setSelectedResource(allResources[0].idResource);
+    }
   };
 
-  const handleAddResource = () => {
+  const handleAddResource = async () => {
     if (selectedResource && !assignedResources.includes(selectedResource)) {
-      setAssignedResources([...assignedResources, selectedResource]);
+      const newResources = [...assignedResources, selectedResource];
+      setAssignedResources(newResources);
+      setValue("assignedResources", newResources);
+      await trigger("assignedResources");
     }
   };
 
-  const handleRemoveResource = (id) => {
-    setAssignedResources(assignedResources.filter((r) => r !== id));
+  const handleRemoveResource = async (id) => {
+    const newResources = assignedResources.filter((r) => r !== id);
+    setAssignedResources(newResources);
+    setValue("assignedResources", newResources);
+    await trigger("assignedResources");
   };
 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!taskName.trim() || !taskDescription.trim()) {
-        alert("Nombre y descripción son obligatorios");
-        return;
-    }
-
+  const onSubmit = async (data) => {
     const tokenValidation = verifyToken();
     if (!tokenValidation.isValid) {
       alert(`Error de autenticación: ${tokenValidation.message}`);
       return;
     }
 
-    // Payload garantizado sin undefined
     const payload = {
       idFunction: internalFunctionId,
-      taskName: taskName,
-      taskDescription: taskDescription,
-      priority: priorityMapToApi[priority],
-      dateEnd: dateEnd,
-      resourceList: assignedResources
+      taskName: data.taskName.trim(),
+      taskDescription: data.taskDescription.trim(),
+      priority: priorityMapToApi[data.priority],
+      dateEnd: data.dateEnd,
+      resourceList: data.assignedResources
     };
 
     console.log("Enviando tarea:", payload);
 
     try {
-     
-        const response = await fetch("http://localhost:5111/api/Task", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${tokenValidation.token}`
-          },
-          body: JSON.stringify(payload)
-        });
+      const response = await fetch("http://localhost:5111/api/Task", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${tokenValidation.token}`
+        },
+        body: JSON.stringify(payload)
+      });
 
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          throw new Error("Sesión expirada.");
-        }
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        throw new Error("Sesión expirada.");
+      }
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || response.statusText);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || response.statusText);
+      }
 
-        const result = await response.json();
+      const result = await response.json();
+      
+      setShowSuccessAlert(true);
+      
+      setTimeout(() => {
         handleCloseAndReset();
-        alert("Tarea creada exitosamente");
+      }, 2000);
 
     } catch (error) {
       console.error("Error:", error);
@@ -207,20 +264,28 @@ useEffect(() => {
 
   const handleCloseAndReset = () => {
     onHide();
-    // Pequeño timeout para limpiar visualmente después de cerrar
     setTimeout(() => resetForm(), 200);
   };
 
   return (
     <Modal show={show} onHide={handleCloseAndReset} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>+
+        <Modal.Title>
           {isEditMode ? "Modificar Tarea" : "Crear Nueva Tarea"}
         </Modal.Title>
       </Modal.Header>
 
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Modal.Body>
+          {showSuccessAlert && (
+            <Alert variant="success" className="mb-3">
+              <Alert.Heading className="h6 mb-1">
+                ✅ ¡Éxito!
+              </Alert.Heading>
+              <p className="mb-0">Tarea creada exitosamente</p>
+            </Alert>
+          )}
+
           {/* ID de la funcionalidad */}
           <Form.Group className="mb-3">
             <Form.Label>ID de Funcionalidad</Form.Label>
@@ -238,70 +303,145 @@ useEffect(() => {
 
           {/* NOMBRE */}
           <Form.Group className="mb-3">
-            <Form.Label>Nombre de la Tarea</Form.Label>
+            <Form.Label>Nombre de la Tarea *</Form.Label>
             <Form.Control
               type="text"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              required
+              {...register("taskName", {
+                required: "El nombre de la tarea es obligatorio",
+                minLength: {
+                  value: 3,
+                  message: "El nombre debe tener al menos 3 caracteres"
+                },
+                maxLength: {
+                  value: 20,
+                  message: "El nombre no puede exceder 20 caracteres"
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                  message: "El nombre contiene caracteres no válidos"
+                }
+              })}
+              isInvalid={!!errors.taskName}
               placeholder="Ingresa el nombre de la tarea"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.taskName?.message}
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              {watchTaskName.length}/20 caracteres
+            </Form.Text>
           </Form.Group>
 
-          {/* DESCRIPCIÓN */}
+          {/* DESCRIPCIÓN - MÁXIMO 40 CARACTERES */}
           <Form.Group className="mb-3">
-            <Form.Label>Descripción</Form.Label>
+            <Form.Label>Descripción *</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
-              value={taskDescription}
-              onChange={(e) => setTaskDescription(e.target.value)}
-              required
+              {...register("taskDescription", {
+                required: "La descripción es obligatoria",
+                minLength: {
+                  value: 10,
+                  message: "La descripción debe tener al menos 10 caracteres"
+                },
+                maxLength: {
+                  value: 40, // ✅ MÁXIMO 40 CARACTERES
+                  message: "La descripción no puede exceder 40 caracteres"
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,!?()]+$/,
+                  message: "La descripción contiene caracteres no válidos"
+                },
+                validate: {
+                  notOnlySpaces: value => 
+                    value.trim().length > 0 || "La descripción no puede contener solo espacios",
+                  meaningfulContent: value => 
+                    value.trim().split(' ').length >= 3 || "La descripción debe ser más específica (mínimo 3 palabras)"
+                }
+              })}
+              isInvalid={!!errors.taskDescription}
               placeholder="Describe la tarea en detalle"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.taskDescription?.message}
+            </Form.Control.Feedback>
+            <Form.Text className={`${watchTaskDescription.length > 40 ? 'text-danger' : 'text-muted'}`}>
+              {watchTaskDescription.length}/40 caracteres
+            </Form.Text>
           </Form.Group>
 
           <Row>
             <Col md={6}>
               {/* FECHA */}
               <Form.Group className="mb-3">
-                <Form.Label>Fecha Límite</Form.Label>
+                <Form.Label>Fecha Límite *</Form.Label>
                 <Form.Control
                   type="date"
-                  value={dateEnd}
-                  onChange={(e) => setDateEnd(e.target.value)}
-                  required
+                  {...register("dateEnd", {
+                    required: "La fecha límite es obligatoria",
+                    validate: validateFutureDate
+                  })}
+                  isInvalid={!!errors.dateEnd}
+                  min={getMinDate()}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {errors.dateEnd?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
               {/* PRIORIDAD */}
               <Form.Group className="mb-3">
-                <Form.Label>Prioridad</Form.Label>
-                <ToggleButtonGroup
-                  type="radio"
-                  name="priority"
-                  value={priority}
-                  onChange={setPriority}
-                  className="w-100 d-flex gap-2"
-                >
-                  <ToggleButton id="priority-low" value="Baja" variant={priority === "Baja" ? "success" : "outline-success"}>
-                    Baja
-                  </ToggleButton>
-                  <ToggleButton id="priority-medium" value="Media" variant={priority === "Media" ? "primary" : "outline-primary"}>
-                    Media
-                  </ToggleButton>
-                  <ToggleButton id="priority-high" value="Alta" variant={priority === "Alta" ? "warning" : "outline-warning"}>
-                    Alta
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                <Form.Label>Prioridad *</Form.Label>
+                <div>
+                  <input
+                    type="hidden"
+                    {...register("priority", {
+                      required: "La prioridad es obligatoria"
+                    })}
+                  />
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="priority"
+                    value={watch("priority", "Media")}
+                    onChange={(val) => setValue("priority", val)}
+                    className="w-100 d-flex gap-2"
+                  >
+                    <ToggleButton 
+                      id="priority-low" 
+                      value="Baja" 
+                      variant={watch("priority") === "Baja" ? "success" : "outline-success"}
+                    >
+                      Baja
+                    </ToggleButton>
+                    <ToggleButton 
+                      id="priority-medium" 
+                      value="Media" 
+                      variant={watch("priority") === "Media" ? "primary" : "outline-primary"}
+                    >
+                      Media
+                    </ToggleButton>
+                    <ToggleButton 
+                      id="priority-high" 
+                      value="Alta" 
+                      variant={watch("priority") === "Alta" ? "warning" : "outline-warning"}
+                    >
+                      Alta
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </div>
+                {errors.priority && (
+                  <div className="text-danger small mt-1">
+                    {errors.priority.message}
+                  </div>
+                )}
               </Form.Group>
             </Col>
           </Row>
 
-          {/* === SECCIÓN DE RECURSOS RESTAURADA (Tu diseño original) === */}
+          {/* RECURSOS */}
           <Form.Group className="mb-3">
-            <Form.Label>Asignar Recursos</Form.Label>
+            <Form.Label>Asignar Recursos *</Form.Label>
 
             {resourcesError && (
               <div className="alert alert-warning py-2">
@@ -335,8 +475,16 @@ useEffect(() => {
               </Button>
             </InputGroup>
 
+            {/* Campo oculto para validación de recursos */}
+            <input
+              type="hidden"
+              {...register("assignedResources", {
+                validate: validateAssignedResources
+              })}
+            />
+
             {/* Lista de recursos asignados */}
-            <div className="mt-2 p-2 border rounded">
+            <div className={`mt-2 p-2 border rounded ${errors.assignedResources ? 'border-danger' : ''}`}>
               <Form.Label className="small mb-2">Recursos asignados:</Form.Label>
               {assignedResources.length === 0 ? (
                 <p className="text-muted small mb-0">No hay recursos asignados.</p>
@@ -357,16 +505,33 @@ useEffect(() => {
                 })
               )}
             </div>
+            {errors.assignedResources && (
+              <div className="text-danger small mt-1">
+                {errors.assignedResources.message}
+              </div>
+            )}
           </Form.Group>
 
+          {/* Mensaje de campos obligatorios */}
+          <div className="text-muted small">
+            * Campos obligatorios
+          </div>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="light" onClick={handleCloseAndReset} disabled={isLoading}>
+          <Button 
+            variant="light" 
+            onClick={handleCloseAndReset} 
+            disabled={isSubmitting || isLoading}
+          >
             Cancelar
           </Button>
-          <Button variant="dark" type="submit" disabled={isLoading}>
-            {isLoading ? "Procesando..." : (isEditMode ? "Guardar Cambios" : "Crear Tarea")}
+          <Button 
+            variant="dark" 
+            type="submit" 
+            disabled={isSubmitting || isLoading}
+          >
+            {isSubmitting || isLoading ? "Procesando..." : (isEditMode ? "Guardar Cambios" : "Crear Tarea")}
           </Button>
         </Modal.Footer>
       </Form>

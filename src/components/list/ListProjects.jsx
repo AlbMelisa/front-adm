@@ -160,7 +160,11 @@ const ListProjects = () => {
       )
     );
   };
-
+const handleDeleteProject = (deletedProjectId) => {
+  setProyectos(prevProyectos => 
+    prevProyectos.filter(project => project.idProject !== deletedProjectId)
+  );
+};
   // Asegurar que proyectos siempre sea un array antes de usar filter
   const proyectosFiltrados = Array.isArray(proyectos)
     ? proyectos.filter(
@@ -279,20 +283,30 @@ const ListProjects = () => {
                           </Dropdown.Item>
 
                           {["Administrator"].includes(userRole) && (
-                            <Dropdown.Item
-                              onClick={() => handleShowUpdateModal(project)}
-                            >
-                              Modificar
+                            <div>
+                              <Dropdown.Item
+                                onClick={() => handleShowUpdateModal(project)}
+                              >
+                                Modificar
+                              </Dropdown.Item>
+                            <Dropdown.Item>
+                              <DeleteButton
+                                idProject={project.idProject}
+                                projectName={project.nameProject}
+                                onDelete={handleDeleteProject}
+                              />
                             </Dropdown.Item>
+                            <Dropdown.Item
+                            onClick={() =>
+                              navigate(`/projectslist/history/${project.idProject}`)
+                            }
+                            >
+                              Historial
+                              
+                            </Dropdown.Item>
+                            </div>
                           )}
 
-                          <Dropdown.Item>
-                            <DeleteButton
-                              idProject={project.idProject}
-                              projectName={project.nameProject}
-                              onDelete={setProyectos}
-                            />
-                          </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>

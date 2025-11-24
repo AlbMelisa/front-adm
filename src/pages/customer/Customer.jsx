@@ -1,148 +1,3 @@
-// import React, { useState } from "react";
-// import {
-//   Form,
-//   InputGroup,
-//   Table,
-//   Button,
-//   Badge,
-//   Card,
-// } from "react-bootstrap";
-// import CustomerHistory from "../../components/customerHistory/customerHistory.jsx";
-// import "./customer.css";
-
-// const initialCustomers = [
-//   { id: 501, nombre: "Tech Solutions Inc.", email: "contact@techsolutions.com", telefono: "+1 234-567-8900", proyectos: 3 },
-//   { id: 502, nombre: "Digital Innovators", email: "info@digitalinnovators.com", telefono: "+1 234-567-8901", proyectos: 2 },
-//   { id: 503, nombre: "Global Fitness Co.", email: "hello@globalfitness.com", telefono: "+1 234-567-8902", proyectos: 1 },
-//   { id: 504, nombre: "Health Systems Ltd.", email: "contact@healthsystems.com", telefono: "+1 234-567-8903", proyectos: 0 },
-// ];
-
-// const Customer = () => {
-//   const [search, setSearch] = useState("");
-
-//   // Estados para el modal
-//   const [showHistory, setShowHistory] = useState(false);
-//   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
-
-//   const filtered = initialCustomers.filter(
-//     (c) =>
-//       c.nombre.toLowerCase().includes(search.toLowerCase()) ||
-//       c.id.toString().includes(search)
-//   );
-
-//   // Abrir modal con cliente seleccionado
-//   const abrirHistorial = (cliente) => {
-//     setClienteSeleccionado(cliente);
-//     setShowHistory(true);
-//   };
-
-//   return (
-//     <div className="customer-container">
-
-//       {/* TÍTULO */}
-//       <h2 className="customer-title">Clientes</h2>
-
-//       {/* BUSCADOR */}
-//       <div className="customer-search-card shadow-sm">
-//         <Card.Body>
-//           <InputGroup>
-//             <InputGroup.Text className="search-icon">🔍</InputGroup.Text>
-//             <Form.Control
-//               type="text"
-//               placeholder="Buscar cliente por nombre o ID"
-//               value={search}
-//               onChange={(e) => setSearch(e.target.value)}
-//             />
-//           </InputGroup>
-//         </Card.Body>
-//       </div>
-
-//       {/* TABLA: solo aparece si hay búsqueda */}
-//       {search.trim() !== "" && (
-//         <div className="customer-table-card shadow-sm mt-4">
-//           <Card.Body className="p-0">
-//             <Table hover responsive className="customer-table mb-0">
-//               <thead>
-//                 <tr>
-//                   <th>ID</th>
-//                   <th>NOMBRE</th>
-//                   <th>EMAIL</th>
-//                   <th>TELÉFONO</th>
-//                   <th>PROYECTOS</th>
-//                   <th>ACCIONES</th>
-//                 </tr>
-//               </thead>
-
-//               <tbody>
-//                 {filtered.length > 0 ? (
-//                   filtered.map((c) => (
-//                     <tr key={c.id}>
-//                       <td>{c.id}</td>
-//                       <td className="customer-name">{c.nombre}</td>
-//                       <td>{c.email}</td>
-//                       <td>{c.telefono}</td>
-//                       <td>
-//                         <Badge pill bg="light" text="dark" className="customer-badge">
-//                           {c.proyectos} proyectos
-//                         </Badge>
-//                       </td>
-//                       <td>
-//                         <Button
-//                           size="sm"
-//                           className="btn-historial"
-//                           onClick={() => abrirHistorial(c)}
-//                         >
-//                           Ver Historial
-//                         </Button>
-//                       </td>
-//                     </tr>
-//                   ))
-//                 ) : (
-//                   <tr>
-//                     <td colSpan="6" className="text-center py-3 text-muted">
-//                       No se encontraron coincidencias.
-//                     </td>
-//                   </tr>
-//                 )}
-//               </tbody>
-//             </Table>
-//           </Card.Body>
-//         </div>
-//       )}
-
-//       {/* MODAL DE HISTORIAL */}
-//       {clienteSeleccionado && (
-//         <CustomerHistory
-//           show={showHistory}
-//           handleClose={() => setShowHistory(false)}
-//           cliente={{
-//             nombreCliente: clienteSeleccionado.nombre,
-//             proyectos: [
-//               {
-//                 idProyecto: 1,
-//                 nombreProyecto: "Migración a la Nube V3",
-//                 estadoProyecto: "En Planificación",
-//               },
-//               {
-//                 idProyecto: 5,
-//                 nombreProyecto: "Actualización Sistema V2",
-//                 estadoProyecto: "Completado",
-//               },
-//               {
-//                 idProyecto: 8,
-//                 nombreProyecto: "Integración API Externa",
-//                 estadoProyecto: "Completado",
-//               },
-//             ],
-//           }}
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Customer;
-
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -151,104 +6,212 @@ import {
   Button,
   Badge,
   Card,
-  Spinner
+  Spinner,
+  Pagination
 } from "react-bootstrap";
-import CustomerHistory from "../../components/customerHistory/customerHistory.jsx";
 import "./customer.css";
+import CustomerHistory from "../../components/customerHistory/customerHistory";
 
 const Customer = () => {
   const [search, setSearch] = useState("");
   const [clientes, setClientes] = useState([]);
-  const [clientesConProyectos, setClientesConProyectos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [loadingProyectos, setLoadingProyectos] = useState(false);
+
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Número de items por página
 
   // Estados para el modal
   const [showHistory, setShowHistory] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+  const [proyectosCliente, setProyectosCliente] = useState([]);
+  const [loadingProyectos, setLoadingProyectos] = useState(false);
 
-  // Cargar clientes desde el JSON
+  // Obtener el token del localStorage o sessionStorage
+  const getToken = () => {
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  };
+
+  // Headers con autorización
+  const getAuthHeaders = () => {
+    const token = getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  // Cargar clientes desde la API
   const fetchClientes = async () => {
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch("http://localhost:3001/clientsRegistered");
+      const token = getToken();
+      if (!token) {
+        setError("No se encontró token de autenticación");
+        return;
+      }
+
+      const resp = await fetch("http://localhost:5111/api/Clients/getAll", {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+      
+      if (!resp.ok) {
+        if (resp.status === 401) {
+          setError("Token expirado o inválido");
+          return;
+        }
+        throw new Error(`Error ${resp.status}: ${resp.statusText}`);
+      }
+      
       const data = await resp.json();
-      setClientes(data);
-      console.log("Clientes cargados:", data);
+      
+      // Asumiendo que la API devuelve un array de clientes
+      // Si viene con estructura { message, clientsRegistered }, ajustamos
+      const clientesData = data.clientsRegistered || data;
+      setClientes(clientesData);
+      console.log("Clientes cargados:", clientesData);
     } catch (error) {
       console.error("Error cargando clientes:", error);
-      setError("Error al cargar los clientes");
+      setError(error.message || "Error al cargar los clientes");
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar proyectos usando SOLO getByIdWithProjects
-  const fetchProyectosConGetById = async () => {
+  // Cargar proyectos de un cliente específico
+  const fetchProyectosCliente = async (idClient) => {
     setLoadingProyectos(true);
     try {
-      const clientesConProyectosData = await Promise.all(
-        clientes.map(async (cliente) => {
-          try {
-            // Usar SOLO getByIdWithProjects
-            const resp = await fetch(`http://localhost:3001/getByIdWithProjects?clientFound.fullNameClient=${encodeURIComponent(cliente.fullNameClient)}`);
-            const data = await resp.json();
-            
-            console.log(`Respuesta getByIdWithProjects para ${cliente.fullNameClient}:`, data);
-            
-            // Buscar el cliente en la respuesta
-            const clienteConProyectos = data.find(item => 
-              item.clientFound && item.clientFound.fullNameClient === cliente.fullNameClient
-            );
-            
-            return {
-              ...cliente,
-              cantidadProyectos: clienteConProyectos ? clienteConProyectos.clientFound.projects.length : 0,
-              tieneProyectos: !!clienteConProyectos
-            };
-          } catch (error) {
-            console.error(`Error con getByIdWithProjects para ${cliente.fullNameClient}:`, error);
-            return {
-              ...cliente,
-              cantidadProyectos: 0,
-              tieneProyectos: false
-            };
-          }
-        })
-      );
+      const token = getToken();
+      if (!token) {
+        console.error("No se encontró token de autenticación");
+        setProyectosCliente([]);
+        return;
+      }
+
+      const resp = await fetch(`http://localhost:5111/api/Clients/getByIdWithProjects/${idClient}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
       
-      setClientesConProyectos(clientesConProyectosData);
+      if (!resp.ok) {
+        if (resp.status === 401) {
+          console.error("Token expirado o inválido");
+          setProyectosCliente([]);
+          return;
+        }
+        throw new Error(`Error ${resp.status}: ${resp.statusText}`);
+      }
+      
+      const data = await resp.json();
+      
+      console.log("Proyectos del cliente:", data);
+      
+      if (data.clientFound && data.clientFound.projects) {
+        setProyectosCliente(data.clientFound.projects);
+      } else {
+        setProyectosCliente([]);
+      }
     } catch (error) {
-      console.error("Error cargando proyectos:", error);
+      console.error("Error cargando proyectos del cliente:", error);
+      setProyectosCliente([]);
     } finally {
       setLoadingProyectos(false);
     }
   };
 
+  // Abrir modal con cliente seleccionado
+  const abrirHistorial = async (cliente) => {
+    setClienteSeleccionado(cliente);
+    setShowHistory(true);
+    
+    // Cargar los proyectos del cliente seleccionado
+    await fetchProyectosCliente(cliente.idClient);
+  };
+
+  // Verificar autenticación al cargar el componente
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      setError("No estás autenticado. Por favor, inicia sesión.");
+      return;
+    }
     fetchClientes();
   }, []);
 
-  useEffect(() => {
-    if (clientes.length > 0) {
-      fetchProyectosConGetById();
-    }
-  }, [clientes]);
-
   // Filtrar clientes basado en la búsqueda
-  const filtered = clientesConProyectos.filter(
-    (c) =>
-      c.fullNameClient.toLowerCase().includes(search.toLowerCase()) ||
-      c.dniClient.toString().includes(search) ||
-      c.id.toString().includes(search)
-  );
+  const filtered = search.trim() === "" 
+    ? clientes  // Si no hay búsqueda, mostrar todos los clientes
+    : clientes.filter(
+        (c) =>
+          c.fullNameClient?.toLowerCase().includes(search.toLowerCase()) ||
+          c.dniClient?.toString().includes(search) ||
+          c.idClient?.toString().includes(search)
+      );
 
-  // Abrir modal con cliente seleccionado
-  const abrirHistorial = (cliente) => {
-    setClienteSeleccionado(cliente);
-    setShowHistory(true);
+  // Resetear a página 1 cuando se realiza una búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  // Calcular datos para paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  // Cambiar página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Generar números de página
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  // Función para manejar cierre de sesión o redirección
+  const handleAuthError = () => {
+    // Limpiar token y redirigir al login
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    window.location.href = '/login'; // Ajusta la ruta según tu aplicación
+  };
+
+  // Componente de paginación
+  const PaginationComponent = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <div className="text-muted">
+          Mostrando {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filtered.length)} de {filtered.length} clientes
+        </div>
+        <Pagination className="mb-0">
+          <Pagination.Prev 
+            disabled={currentPage === 1}
+            onClick={() => paginate(currentPage - 1)}
+          />
+          
+          {pageNumbers.map(number => (
+            <Pagination.Item
+              key={number}
+              active={number === currentPage}
+              onClick={() => paginate(number)}
+            >
+              {number}
+            </Pagination.Item>
+          ))}
+          
+          <Pagination.Next 
+            disabled={currentPage === totalPages}
+            onClick={() => paginate(currentPage + 1)}
+          />
+        </Pagination>
+      </div>
+    );
   };
 
   return (
@@ -283,89 +246,82 @@ const Customer = () => {
       {error && (
         <div className="text-center py-4 text-danger">
           <p>{error}</p>
-          <Button variant="outline-primary" size="sm" onClick={fetchClientes}>
-            Reintentar
-          </Button>
+          {error.includes("token") || error.includes("autenticado") ? (
+            <Button variant="outline-danger" size="sm" onClick={handleAuthError}>
+              Iniciar Sesión
+            </Button>
+          ) : (
+            <Button variant="outline-primary" size="sm" onClick={fetchClientes}>
+              Reintentar
+            </Button>
+          )}
         </div>
       )}
 
-      {/* TABLA: solo aparece si hay búsqueda */}
-      {search.trim() !== "" && !loading && !error && (
-        <div className="customer-table-card shadow-sm mt-4">
-          <Card.Body className="p-0">
-            <Table hover responsive className="customer-table mb-0">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>NOMBRE</th>
-                  <th>EMAIL</th>
-                  <th>TELÉFONO</th>
-                  <th>DNI</th>
-                  <th>PROYECTOS</th>
-                  <th>ACCIONES</th>
-                </tr>
-              </thead>
+      {/* TABLA: muestra todos los clientes o los filtrados */}
+      {!loading && !error && (
+        <>
+          <div className="customer-table-card shadow-sm mt-4">
+            <Card.Body className="p-0">
+              <Table hover responsive className="customer-table mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>NOMBRE</th>
+                    <th>EMAIL</th>
+                    <th>TELÉFONO</th>
+                    <th>DNI</th>
+                    <th>ACCIONES</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {filtered.length > 0 ? (
-                  filtered.map((cliente) => (
-                    <tr key={cliente.id}>
-                      <td>{cliente.id}</td>
-                      <td className="customer-name">{cliente.fullNameClient}</td>
-                      <td>{cliente.mailClient}</td>
-                      <td>{cliente.phoneClient}</td>
-                      <td>{cliente.dniClient}</td>
-                      <td>
-                        <Badge 
-                          pill 
-                          bg={cliente.cantidadProyectos > 0 ? "primary" : "light"} 
-                          text={cliente.cantidadProyectos > 0 ? "white" : "dark"} 
-                          className="customer-badge"
-                        >
-                          {loadingProyectos ? (
-                            <Spinner animation="border" size="sm" />
-                          ) : (
-                            `${cliente.cantidadProyectos} proyectos`
-                          )}
-                        </Badge>
-                      </td>
-                      <td>
-                        <Button
-                          size="sm"
-                          className="btn-historial"
-                          onClick={() => abrirHistorial(cliente)}
-                          disabled={cliente.cantidadProyectos === 0}
-                        >
-                          Ver Historial
-                        </Button>
+                <tbody>
+                  {currentItems.length > 0 ? (
+                    currentItems.map((cliente) => (
+                      <tr key={cliente.idClient}>
+                        <td>{cliente.idClient}</td>
+                        <td className="customer-name">{cliente.fullNameClient}</td>
+                        <td>{cliente.mailClient}</td>
+                        <td>{cliente.phoneClient}</td>
+                        <td>{cliente.dniClient}</td>
+                        <td>
+                          <Button
+                            size="sm"
+                            className="btn-historial"
+                            onClick={() => abrirHistorial(cliente)}
+                          >
+                            Ver Historial
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center py-3 text-muted">
+                        {clientes.length === 0 ? "No hay clientes registrados" : "No se encontraron coincidencias"}
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="text-center py-3 text-muted">
-                      No se encontraron coincidencias.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </Card.Body>
-        </div>
-      )}
+                  )}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </div>
 
-      {/* MENSAJE CUANDO NO HAY BÚSQUEDA */}
-      {search.trim() === "" && !loading && !error && (
-        <div className="text-center py-5 text-muted">
-          <p>Ingresa un nombre, DNI o ID en el buscador para ver los clientes</p>
-        </div>
+          {/* PAGINACIÓN */}
+          <PaginationComponent />
+        </>
       )}
 
       {/* MODAL DE HISTORIAL */}
       <CustomerHistory
         show={showHistory}
-        handleClose={() => setShowHistory(false)}
-        clienteId={clienteSeleccionado?.id}
+        handleClose={() => {
+          setShowHistory(false);
+          setProyectosCliente([]);
+        }}
+        cliente={clienteSeleccionado}
+        proyectos={proyectosCliente}
+        loading={loadingProyectos}
       />
     </div>
   );

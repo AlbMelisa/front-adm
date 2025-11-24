@@ -12,6 +12,7 @@ import Project from "./pages/project/Project.jsx";
 import CreateProject from "./pages/createProject/CreateProject.jsx";
 import ProjectList from "./pages/proyectlist/Project.jsx";
 import { AuthProvider } from "./components/authContext/AuthContext.jsx";
+import ProjectHistoryPage from "./pages/projectHistoryPage/ProjectHistoryPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,8 @@ const router = createBrowserRouter([
       { path: "/projectslist", element: <ProjectList /> },
       { path: "/projectslist/:idProject", element: <Project /> },
       { path: "/projectslist/project/create", element: <CreateProject /> },
+      { path: "/projectslist/history/:idProject", element: <ProjectHistoryPage /> },
+
       { path: "/customers", element: <Customer /> },
       { path: "/reports", element: <Reports /> },
     ],

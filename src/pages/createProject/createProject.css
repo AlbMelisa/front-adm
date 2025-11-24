@@ -19,17 +19,18 @@
 }
 
 .create-btn-custom:hover {
-    background-color: #6a3aae;
+    background-color: #966bd2;
     border-color: #6a3aae;
 }
 
 /* Botón Cancelar (Gris claro) */
 .cancel-btn-custom {
-    background-color: #f0f0f0 !important;
+    background-color: #e4d4d4 !important;
     color: #555 !important;
     border: 1px solid #ccc !important;
     padding: 10px 25px; /* Ajuste de padding */
     font-weight: 600;
+    color: #000000;
 }
 
 .cancel-btn-custom:hover {
@@ -56,8 +57,14 @@
 .form-select:focus,
 .input-group > .form-control:focus,
 .input-group > .form-select:focus {
-    /* Color principal de tu formulario (Morado) */
-    border-color: #7d44c9; 
-    /* Sombra de caja basada en el color principal */
-    box-shadow: 0 0 0 0.25rem rgba(125, 68, 201, 0.25); /* Color morado con 25% de opacidad */
+    border-color: #8455ba; 
+    box-shadow: 0 0 0 0.25rem #40098d40; /* Color morado con 25% de opacidad */
+    background-color: #a490c5;
+    color: white;
+}
+.form-color{
+    background-color: #dfd4f3;
+    border-color: #a490c5;
+    border: 0px 0px 0px 20px;
+    border-radius: 2px;
 }

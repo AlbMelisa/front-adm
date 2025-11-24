@@ -226,8 +226,8 @@ const ModalProject = ({ show, handleClose, project }) => {
 
         {/* Lista de nuevas funcionalidades agregadas */}
         {nuevasFunciones.map((func, index) => (
-          <Card key={index} className="p-3 mb-2 shadow-sm">
-            <div className="d-flex justify-content-between align-items-start">
+          <Card key={index} className="p-3 mb-2 shadow-sm w-100">
+            <div className="d-flex justify-content-between align-items-start w-100">
               <div className="flex-grow-1">
                 <h6 className="mb-1">{func.functionName}</h6>
                 <p className="text-muted mb-0 small">{func.functionDescription}</p>

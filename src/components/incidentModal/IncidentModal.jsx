@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { BsExclamationCircleFill } from "react-icons/bs";
-import './incidentModal.css'
+import { useForm } from "react-hook-form";
+import './incidentModal.css';
 
 // ⭐ TIPOS DE INCIDENCIA ACTUALIZADOS INCLUYENDO "Recursos"
 const tiposDeIncidencia = [
@@ -13,40 +14,82 @@ const tiposDeIncidencia = [
 ];
 
 const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, projectId }) => {
-  const [incidentType, setIncidentType] = useState("");
-  const [description, setDescription] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue,
+    watch
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      tipo: "",
+      descripcion: ""
+    }
+  });
+
+  // Watch para contador de caracteres
+  const watchDescripcion = watch("descripcion", "");
 
   // Efecto para cargar datos cuando se edita
   useEffect(() => {
     if (incidenceData) {
       // Modo edición
-      setIncidentType(incidenceData.typeIncidence || incidenceData.tipo || "");
-      setDescription(incidenceData.descriptionIncidence || incidenceData.descripcion || "");
+      setValue("tipo", incidenceData.typeIncidence || incidenceData.tipo || "");
+      setValue("descripcion", incidenceData.descriptionIncidence || incidenceData.descripcion || "");
     } else {
       // Modo creación - resetear
-      setIncidentType("");
-      setDescription("");
+      reset({
+        tipo: "",
+        descripcion: ""
+      });
     }
-  }, [incidenceData, show]);
+  }, [incidenceData, show, reset, setValue]);
+
+  // Función para mostrar alertas
+  const showAlertMessage = (message, variant = "success") => {
+    setAlertMessage(message);
+    setAlertVariant(variant);
+    setShowAlert(true);
+  };
 
   const handleClose = () => {
-    setIncidentType("");
-    setDescription("");
+    reset();
+    setShowAlert(false);
     onHide();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmitForm = async (data) => {
+    try {
+      // ⭐ PAYLOAD EXACTO CON SOLO LOS 3 CAMPOS REQUERIDOS
+      const payload = {
+        tipo: data.tipo,
+        descripcion: data.descripcion.trim()
+      };
 
-    // ⭐ PAYLOAD EXACTO CON SOLO LOS 3 CAMPOS REQUERIDOS
-    const payload = {
-      tipo: incidentType,
-      descripcion: description
-    };
-
-    // ✅ Llamar a la función onSubmit del componente padre
-    if (onSubmit) {
-      await onSubmit(payload);
+      // ✅ Llamar a la función onSubmit del componente padre
+      if (onSubmit) {
+        await onSubmit(payload);
+        
+        // Mostrar alerta de éxito
+        showAlertMessage(
+          incidenceData 
+            ? "¡Incidencia actualizada exitosamente!" 
+            : "¡Incidencia registrada exitosamente!",
+          "success"
+        );
+      }
+    } catch (error) {
+      // Mostrar alerta de error
+      showAlertMessage(
+        error.message || "Error al procesar la incidencia",
+        "danger"
+      );
     }
   };
 
@@ -59,8 +102,31 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
         </Modal.Title>
       </Modal.Header>
 
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit(onSubmitForm)} noValidate>
         <Modal.Body>
+          {/* Alert de React Bootstrap */}
+          <Alert 
+            show={showAlert} 
+            variant={alertVariant} 
+            dismissible 
+            onClose={() => setShowAlert(false)}
+            className="mb-3"
+          >
+            <div className="d-flex align-items-center">
+              <BsExclamationCircleFill 
+                className={`me-2 ${
+                  alertVariant === "success" ? "text-success" : 
+                  alertVariant === "warning" ? "text-warning" : "text-danger"
+                }`} 
+              />
+              <span className="fw-bold me-2">
+                {alertVariant === "success" ? "Éxito:" : 
+                 alertVariant === "warning" ? "Advertencia:" : "Error:"}
+              </span>
+              {alertMessage}
+            </div>
+          </Alert>
+
           {/* ⭐ INFORMACIÓN DEL PROYECTO (solo lectura) */}
           {projectId && (
             <Form.Group className="mb-3">
@@ -82,9 +148,11 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
               Tipo de Incidencia <span className="text-danger">*</span>
             </Form.Label>
             <Form.Select
-              value={incidentType}
-              onChange={(e) => setIncidentType(e.target.value)}
-              required
+              {...register("tipo", {
+                required: "El tipo de incidencia es obligatorio",
+                validate: value => value !== "" || "Seleccione un tipo de incidencia"
+              })}
+              isInvalid={!!errors.tipo}
             >
               <option value="">Seleccionar tipo de incidencia</option>
               {tiposDeIncidencia.map((tipo) => (
@@ -93,6 +161,9 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
                 </option>
               ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errors.tipo?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -103,23 +174,68 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
               as="textarea"
               rows={4}
               placeholder="Ej: Licencia presentada por un administrador..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
+              {...register("descripcion", {
+                required: "La descripción es obligatoria",
+                minLength: {
+                  value: 10,
+                  message: "La descripción debe tener al menos 10 caracteres"
+                },
+                maxLength: {
+                  value: 500,
+                  message: "La descripción no puede exceder 500 caracteres"
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,!?()]+$/,
+                  message: "La descripción contiene caracteres no válidos"
+                },
+                validate: {
+                  notOnlySpaces: value => 
+                    value.trim().length > 0 || "La descripción no puede contener solo espacios",
+                  meaningfulContent: value => 
+                    value.trim().split(' ').length >= 3 || "La descripción debe ser más específica (mínimo 3 palabras)"
+                }
+              })}
+              isInvalid={!!errors.descripcion}
             />
-            <Form.Text muted>
+            <Form.Control.Feedback type="invalid">
+              {errors.descripcion?.message}
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
               Describa detalladamente la incidencia, incluyendo el impacto y las
-              acciones necesarias
+              acciones necesarias. {watchDescripcion.length}/500 caracteres
             </Form.Text>
           </Form.Group>
+
+          {/* Alert para errores de validación */}
+          {Object.keys(errors).length > 0 && (
+            <Alert variant="warning" className="py-2">
+              <small>
+                <strong>Por favor corrige los siguientes campos:</strong>
+                <ul className="mb-0 mt-1">
+                  {errors.tipo && <li>Tipo de incidencia</li>}
+                  {errors.descripcion && <li>Descripción de la incidencia</li>}
+                </ul>
+              </small>
+            </Alert>
+          )}
         </Modal.Body>
 
         <Modal.Footer>
-          <Button className="btn-cancelar-incidencia" variant="light" onClick={handleClose} disabled={isLoading}>
+          <Button 
+            className="btn-cancelar-incidencia" 
+            variant="light" 
+            onClick={handleClose} 
+            disabled={isLoading || isSubmitting}
+          >
             Cancelar
           </Button>
-          <Button className="btn-registrar-incidencia" variant="warning" type="submit" disabled={isLoading}>
-            {isLoading ? "Guardando..." : (incidenceData ? "Actualizar" : "Registrar")} Incidencia
+          <Button 
+            className="btn-registrar-incidencia" 
+            variant="warning" 
+            type="submit" 
+            disabled={isLoading || isSubmitting}
+          >
+            {isLoading || isSubmitting ? "Guardando..." : (incidenceData ? "Actualizar" : "Registrar")} Incidencia
           </Button>
         </Modal.Footer>
       </Form>

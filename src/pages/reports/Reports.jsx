@@ -1,133 +1,248 @@
-import React, { useEffect, useState } from "react";
-import { FileText, TrendingUp, Users, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Container, Row, Col, ProgressBar, Badge, Table } from "react-bootstrap";
 import {
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   CartesianGrid,
+  Legend
 } from "recharts";
 import "./reports.css";
 
-const Reports = () => {
+export default function ProjectReports() {
+  // --- Estados de Proyectos ---
   const [projects, setProjects] = useState([]);
+  const [averageProgress, setAverageProgress] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
+
+  // --- Estados de Equipos (NUEVO) ---
+  const [teamData, setTeamData] = useState([]);
+  
+  // --- Estados Generales ---
   const [loading, setLoading] = useState(true);
 
-  const [metrics, setMetrics] = useState({
-    activeProjects: 0,
-    completedProjects: 0,
-    avgProgress: 0,
-    totalTeams: 0,
-  });
-
-  const [chartData, setChartData] = useState([]);
-
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await fetch("http://localhost:3001/projectsWithProgress");
-        const data = await res.json();
-
-        const projectsList = data.projectsWithProgress || [];
-        setProjects(projectsList);
-
-        // 📌 Calcular métricas
-        let active = 0;
-        let completed = 0;
-        let progressSum = 0;
-        let totalTeams = 0;
-
-        const chart = projectsList.map((p) => {
-          const proj = p.projectData;
-
-          if (proj.stateProject === "In_Progress") active++;
-          if (proj.stateProject === "Completed") completed++;
-
-          progressSum += p.progressPorcentage;
-          totalTeams += proj.teamNumber;
-
-          return {
-            name: proj.nameProject,
-            progress: p.progressPorcentage,
-          };
-        });
-
-        setMetrics({
-          activeProjects: active,
-          completedProjects: completed,
-          avgProgress:
-            projectsList.length > 0
-              ? (progressSum / projectsList.length).toFixed(1)
-              : 0,
-          totalTeams,
-        });
-
-        setChartData(chart);
-      } catch (err) {
-        console.error("Error obteniendo reportes:", err);
-      } finally {
-        setLoading(false);
-      }
+    // Cargar ambos datos al iniciar
+    const loadAllData = async () => {
+      setLoading(true);
+      await Promise.all([fetchProjects(), fetchTeamPerformance()]);
+      setLoading(false);
     };
 
-    fetchReports();
+    loadAllData();
   }, []);
 
-  if (loading) return <h2>Cargando reportes...</h2>;
+  // 1. Fetch de Proyectos (Existente)
+  const fetchProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "http://localhost:5111/api/Dashboard/getProgress",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.projectsWithProgress || [];
+        setProjects(list);
+
+        const avg =
+          list.length > 0
+            ? list.reduce((sum, p) => sum + p.progressPorcentage, 0) / list.length
+            : 0;
+
+        setAverageProgress(avg.toFixed(1));
+
+        const completed = list.filter(
+          (p) => p.projectData.stateProject === "Completed"
+        ).length;
+
+        setCompletedCount(completed);
+      }
+    } catch (err) {
+      console.error("Error al obtener proyectos:", err);
+    }
+  };
+
+  // 2. Fetch de Rendimiento de Equipos (NUEVO)
+  const fetchTeamPerformance = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "http://localhost:5111/api/Dashboard/getLoadPerTeam",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const result = await res.json();
+        // Mapeamos result.teamWithPerfermance según tu JSON
+        if (result && result.teamWithPerfermance) {
+          setTeamData(result.teamWithPerfermance);
+        }
+      }
+    } catch (err) {
+      console.error("Error al obtener equipos:", err);
+    }
+  };
+
+  // Datos para el gráfico de Proyectos
+  const projectChartData = projects.map((p) => ({
+    name: p.projectData.nameProject,
+    progreso: p.progressPorcentage,
+  }));
+
+  // Datos para el gráfico de Equipos (Mapeo directo del estado)
+  // Recharts puede usar teamData directamente porque las claves coinciden (teamNumber, projectsCount, etc)
 
   return (
-    <div className="reports-container">
-      <h1>Reportes de Proyecto</h1>
+    <div className="m-5 pr-container">
+      {/* TITULO */}
+      <h2 className="pr-title mt-2">Reportes de Gestión</h2>
+      <p className="pr-subtitle">
+        Visualiza el progreso de proyectos y el rendimiento de los equipos
+      </p>
 
-      {/* 🔹 TARJETAS DE MÉTRICAS */}
-      <div className="reports-cards">
-        <div className="report-card">
-          <FileText className="card-icon" size={32} />
-          <h3>Proyectos Activos</h3>
-          <h2>{metrics.activeProjects}</h2>
-          <p>Actualmente en curso</p>
-        </div>
+      {/* --- SECCIÓN 1: KPI CARDS --- */}
+      <Row className="mb-4">
+        <Col md={4}>
+          <div className="pr-card-custom">
+            <h6 className="pr-metric-title">Total Proyectos</h6>
+            <h2 className="pr-metric-value">{projects.length}</h2>
+            <p className="pr-metric-sub">proyectos activos</p>
+          </div>
+        </Col>
 
-        <div className="report-card">
-          <TrendingUp className="card-icon" size={32} />
-          <h3>Progreso Promedio</h3>
-          <h2>{metrics.avgProgress}%</h2>
-          <p>Entre todos los proyectos</p>
-        </div>
+        <Col md={4}>
+          <div className="pr-card-custom">
+            <h6 className="pr-metric-title">Progreso Promedio</h6>
+            <h2 className="pr-metric-value">{averageProgress}%</h2>
+            <p className="pr-metric-sub">de completitud general</p>
+          </div>
+        </Col>
 
-        <div className="report-card">
-          <Users className="card-icon" size={32} />
-          <h3>Equipos Totales Asignados</h3>
-          <h2>{metrics.totalTeams}</h2>
-          <p>Suma de teamNumber</p>
-        </div>
+        <Col md={4}>
+          <div className="pr-card-custom">
+            <h6 className="pr-metric-title">Completados</h6>
+            <h2 className="pr-metric-value">{completedCount}</h2>
+            <p className="pr-metric-sub">proyectos finalizados</p>
+          </div>
+        </Col>
+      </Row>
 
-        <div className="report-card">
-          <Clock className="card-icon" size={32} />
-          <h3>Proyectos Finalizados</h3>
-          <h2>{metrics.completedProjects}</h2>
-          <p>Marcados como Completed</p>
+      {/* --- SECCIÓN 2: GRÁFICO DE PROYECTOS --- */}
+      <div className="pr-card-custom mb-4 pr-chart-custom w-100">
+        <h6 className="fw-bold mb-3">Progreso por Proyecto</h6>
+        <div className="pr-chart-wrapper" style={{ height: "300px" }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={projectChartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="progreso" fill="#b34eff" name="Progreso %" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
-      {/* 🔹 GRÁFICO DE BARRAS */}
-      <div className="chart-container">
-        <h2>Progreso por Proyecto</h2>
+      {/* --- SECCIÓN 3: RENDIMIENTO DE EQUIPOS (NUEVO) --- */}
+      <Row>
+        {/* Gráfico de Carga de Trabajo */}
+        <Col lg={6} className="mb-4">
+          <div className="pr-card-custom h-100">
+            <h6 className="fw-bold mb-3">Carga de Trabajo por Equipo</h6>
+            <div style={{ height: "300px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={teamData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="teamNumber" tickFormatter={(val) => `Eq. ${val}`} />
+                  <YAxis />
+                  <Tooltip 
+                     formatter={(value, name) => [value, name === 'projectsCount' ? 'Total Asignado' : 'Completados']}
+                  />
+                  <Legend />
+                  <Bar dataKey="projectsCount" name="Total Proyectos" fill="#e9ecef" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="numberCompletedProjects" name="Completados" fill="#4ecf92" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </Col>
 
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[0, 100]} />
-            <Tooltip />
-            <Bar dataKey="progress" fill="#4f46e5" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+        {/* Tabla de Eficiencia */}
+        <Col lg={6} className="mb-4">
+          <div className="pr-card-custom h-100">
+            <h6 className="fw-bold mb-3">Detalle de Eficiencia</h6>
+            <Table hover responsive className="align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Equipo</th>
+                  <th className="text-center">Carga</th>
+                  <th>Eficiencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teamData.length > 0 ? (
+                  teamData.map((team) => {
+                    // Calculo de porcentaje seguro
+                    const percentage = team.projectsCount === 0 
+                      ? 0 
+                      : Math.round((team.numberCompletedProjects / team.projectsCount) * 100);
+                    
+                    // Color dinámico
+                    let variant = "primary"; // por defecto azul/morado
+                    if (percentage === 100) variant = "success";
+                    else if (percentage < 30) variant = "warning";
+
+                    return (
+                      <tr key={team.teamNumber}>
+                        <td className="fw-bold">Equipo {team.teamNumber}</td>
+                        <td className="text-center">
+                          <Badge bg="light" text="dark" className="border">
+                            {team.numberCompletedProjects} / {team.projectsCount}
+                          </Badge>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <div className="flex-grow-1 me-2">
+                              <ProgressBar 
+                                now={percentage} 
+                                variant={variant} 
+                                style={{ height: "6px" }} 
+                              />
+                            </div>
+                            <small className="text-muted fw-bold">{percentage}%</small>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center text-muted">No hay datos de equipos</td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+        </Col>
+      </Row>
+
     </div>
   );
-};
-
-export default Reports;
+}
