@@ -121,7 +121,8 @@ const CreateProject = () => {
   const convertDate = (value) => {
     if (!value) return null;
     const [day, month, year] = value.split("/");
-    return `${year}-${month}-${day}T00:00:00`;
+    // Asegurar formato correcto: "2026-05-20T00:00:00"
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`;
   };
 
   // Validación personalizada para fecha futura
@@ -149,10 +150,11 @@ const CreateProject = () => {
     return true;
   };
 
-  // Submit handler
+  // Submit handler - ENVIAR SOLO UN PROYECTO
   const onSubmit = async (formData) => {
     const endpoint = "http://localhost:5111/api/Projects";
 
+    // Crear un solo objeto de proyecto (no array)
     const payload = {
       idClient: parseInt(formData.clientName),
       idTeam: parseInt(formData.teamNumber),
@@ -168,26 +170,46 @@ const CreateProject = () => {
       }))
     };
 
+    // Debug: ver qué se está enviando
+    console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
+
     try {
       const token = localStorage.getItem("token");
+      
+      if (!token) {
+        showAlertMessage("No hay token de autenticación", "danger");
+        return;
+      }
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        let msg = `Error ${response.status}`;
+        let errorMsg = `Error ${response.status}`;
         try {
-          const err = await response.json();
-          msg = err.message || err.title || msg;
-        } catch {}
-        throw new Error(msg);
+          const errorText = await response.text();
+          console.error("Respuesta del servidor:", errorText);
+          
+          if (errorText) {
+            const errorData = JSON.parse(errorText);
+            errorMsg = errorData.message || errorData.title || errorMsg;
+          }
+        } catch (parseError) {
+          console.error("Error parseando respuesta:", parseError);
+        }
+        throw new Error(errorMsg);
       }
 
+      const result = await response.json();
+      console.log("Respuesta exitosa:", result);
+      
       showAlertMessage("¡Proyecto creado exitosamente!", "success");
       
       setTimeout(() => {
@@ -300,8 +322,8 @@ const CreateProject = () => {
                     message: "La descripción debe tener al menos 10 caracteres"
                   },
                   maxLength: {
-                    value: 40,
-                    message: "La descripción no puede exceder 40 caracteres"
+                    value: 50,
+                    message: "La descripción no puede exceder 50 caracteres"
                   }
                 })}
                 isInvalid={!!errors.descriptionProject}
@@ -310,7 +332,7 @@ const CreateProject = () => {
                 {errors.descriptionProject?.message}
               </Form.Control.Feedback>
               <Form.Text className="text-muted">
-                {watchDescription.length}/40 caracteres
+                {watchDescription.length}/50 caracteres
               </Form.Text>
             </Form.Group>
           </Col>

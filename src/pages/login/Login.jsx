@@ -125,6 +125,9 @@ const Login = () => {
               Manager: sofia9 | Sofia123
             </p>
             <p>
+              Tester: melisa8 | Melisa123
+            </p>
+            <p>
              Developer: martin10 | Martin123
             </p>
           </Card.Body>

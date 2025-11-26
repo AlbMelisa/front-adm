@@ -176,7 +176,7 @@ export default function ProjectReports() {
                      formatter={(value, name) => [value, name === 'projectsCount' ? 'Total Asignado' : 'Completados']}
                   />
                   <Legend />
-                  <Bar dataKey="projectsCount" name="Total Proyectos" fill="#e9ecef" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="projectsCount" name="Total Proyectos" fill="#9c3cafff" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="numberCompletedProjects" name="Completados" fill="#4ecf92" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
