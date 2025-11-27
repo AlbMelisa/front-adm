@@ -62,9 +62,11 @@ export default function ProjectReports() {
 
         setAverageProgress(avg.toFixed(1));
 
-        const completed = list.filter(
-          (p) => p.projectData.stateProject === "Completed"
-        ).length;
+        // Sumar proyectos completados de los proyectos individuales
+        const completed = list.reduce(
+          (sum, p) => sum + (p.numberCompletedProjects || 0),
+          0
+        );
 
         setCompletedCount(completed);
       }
@@ -87,17 +89,44 @@ export default function ProjectReports() {
           },
         }
       );
-
       if (res.ok) {
         const result = await res.json();
+        console.log(result)
         // Mapeamos result.teamWithPerfermance según tu JSON
         if (result && result.teamWithPerfermance) {
           setTeamData(result.teamWithPerfermance);
+          
+          // ⭐ SUMAR PROYECTOS COMPLETADOS DE TODOS LOS EQUIPOS
+          const totalCompletedFromTeams = result.teamWithPerfermance.reduce(
+            (total, team) => total + (team.numberCompletedProjects || 0),
+            0
+          );
+          
+          console.log("Total completados de equipos:", totalCompletedFromTeams);
+          
+          // Opcional: Actualizar el estado de completedCount con la suma de equipos
+          // setCompletedCount(totalCompletedFromTeams);
         }
       }
     } catch (err) {
       console.error("Error al obtener equipos:", err);
     }
+  };
+
+  // ⭐ FUNCIÓN PARA CALCULAR EL TOTAL DE PROYECTOS COMPLETADOS DE TODOS LOS EQUIPOS
+  const getTotalCompletedFromTeams = () => {
+    return teamData.reduce(
+      (total, team) => total + (team.numberCompletedProjects || 0),
+      0
+    );
+  };
+
+  // ⭐ FUNCIÓN PARA CALCULAR EL TOTAL DE PROYECTOS ASIGNADOS A TODOS LOS EQUIPOS
+  const getTotalProjectsFromTeams = () => {
+    return teamData.reduce(
+      (total, team) => total + (team.projectsCount || 0),
+      0
+    );
   };
 
   // Datos para el gráfico de Proyectos
@@ -106,8 +135,9 @@ export default function ProjectReports() {
     progreso: p.progressPorcentage,
   }));
 
-  // Datos para el gráfico de Equipos (Mapeo directo del estado)
-  // Recharts puede usar teamData directamente porque las claves coinciden (teamNumber, projectsCount, etc)
+  // Calcular totales (para usar en donde necesites)
+  const totalCompletedTeams = getTotalCompletedFromTeams();
+  const totalProjectsTeams = getTotalProjectsFromTeams();
 
   return (
     <div className="m-5 pr-container">
@@ -119,7 +149,7 @@ export default function ProjectReports() {
 
       {/* --- SECCIÓN 1: KPI CARDS --- */}
       <Row className="mb-4">
-        <Col md={4}>
+        <Col >
           <div className="pr-card-custom">
             <h6 className="pr-metric-title">Total Proyectos</h6>
             <h2 className="pr-metric-value">{projects.length}</h2>
@@ -127,7 +157,7 @@ export default function ProjectReports() {
           </div>
         </Col>
 
-        <Col md={4}>
+        <Col >
           <div className="pr-card-custom">
             <h6 className="pr-metric-title">Progreso Promedio</h6>
             <h2 className="pr-metric-value">{averageProgress}%</h2>
@@ -135,11 +165,22 @@ export default function ProjectReports() {
           </div>
         </Col>
 
-        <Col md={4}>
+        {/* <Col md={3}>
           <div className="pr-card-custom">
             <h6 className="pr-metric-title">Completados</h6>
             <h2 className="pr-metric-value">{completedCount}</h2>
             <p className="pr-metric-sub">proyectos finalizados</p>
+          </div>
+        </Col> */}
+
+        {/* ⭐ NUEVO KPI: TOTAL COMPLETADOS DE EQUIPOS */}
+        <Col >
+          <div className="pr-card-custom">
+            <h6 className="pr-metric-title">Completados por Equipos</h6>
+            <h2 className="pr-metric-value">{totalCompletedTeams}</h2>
+            <p className="pr-metric-sub">
+              de {totalProjectsTeams} asignados
+            </p>
           </div>
         </Col>
       </Row>
@@ -188,6 +229,28 @@ export default function ProjectReports() {
         <Col lg={6} className="mb-4">
           <div className="pr-card-custom h-100">
             <h6 className="fw-bold mb-3">Detalle de Eficiencia</h6>
+            
+            {/* ⭐ RESUMEN DE TOTALES */}
+            <div className="mb-3 p-3 border rounded bg-light">
+              <div className="d-flex justify-content-between">
+                <span><strong>Total completados:</strong></span>
+                <span><strong>{totalCompletedTeams} / {totalProjectsTeams}</strong></span>
+              </div>
+              <div className="d-flex justify-content-between">
+                <span>Porcentaje general:</span>
+                <span>
+                  <Badge bg={
+                    totalProjectsTeams === 0 ? 'secondary' : 
+                    (totalCompletedTeams / totalProjectsTeams) >= 0.7 ? 'success' : 
+                    (totalCompletedTeams / totalProjectsTeams) >= 0.4 ? 'warning' : 'danger'
+                  }>
+                    {totalProjectsTeams === 0 ? '0%' : 
+                     Math.round((totalCompletedTeams / totalProjectsTeams) * 100)}%
+                  </Badge>
+                </span>
+              </div>
+            </div>
+
             <Table hover responsive className="align-middle">
               <thead className="table-light">
                 <tr>
