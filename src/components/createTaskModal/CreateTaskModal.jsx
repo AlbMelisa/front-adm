@@ -347,12 +347,12 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
               {...register("taskDescription", {
                 required: "La descripción es obligatoria",
                 minLength: {
-                  value: 10,
-                  message: "La descripción debe tener al menos 10 caracteres"
+                  value: 20,
+                  message: "La descripción debe tener al menos 20 caracteres"
                 },
                 maxLength: {
-                  value: 50, // ✅ MÁXIMO 40 CARACTERES
-                  message: "La descripción no puede exceder 50 caracteres"
+                  value: 150, // ✅ MÁXIMO 40 CARACTERES
+                  message: "La descripción no puede exceder 150 caracteres"
                 },
                 pattern: {
                   value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,!?()]+$/,
@@ -372,7 +372,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
               {errors.taskDescription?.message}
             </Form.Control.Feedback>
             <Form.Text className={`${watchTaskDescription.length > 40 ? 'text-danger' : 'text-muted'}`}>
-              {watchTaskDescription.length}/50 caracteres
+              {watchTaskDescription.length}/150 caracteres
             </Form.Text>
           </Form.Group>
 

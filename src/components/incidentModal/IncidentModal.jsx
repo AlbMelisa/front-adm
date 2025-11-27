@@ -104,7 +104,7 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
 
       <Form onSubmit={handleSubmit(onSubmitForm)} noValidate>
         <Modal.Body>
-          {/* Alert de React Bootstrap */}
+          {/* ✅ ALERT BOOTSTRAP POR DEFECTO */}
           <Alert 
             show={showAlert} 
             variant={alertVariant} 
@@ -112,19 +112,7 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
             onClose={() => setShowAlert(false)}
             className="mb-3"
           >
-            <div className="d-flex align-items-center">
-              <BsExclamationCircleFill 
-                className={`me-2 ${
-                  alertVariant === "success" ? "text-success" : 
-                  alertVariant === "warning" ? "text-warning" : "text-danger"
-                }`} 
-              />
-              <span className="fw-bold me-2">
-                {alertVariant === "success" ? "Éxito:" : 
-                 alertVariant === "warning" ? "Advertencia:" : "Error:"}
-              </span>
-              {alertMessage}
-            </div>
+            {alertMessage}
           </Alert>
 
           {/* ⭐ INFORMACIÓN DEL PROYECTO (solo lectura) */}

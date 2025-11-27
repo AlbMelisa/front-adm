@@ -81,7 +81,7 @@ const ProgressByFeatureCard = ({ features, normalizeTaskState }) => {
 
           {/* 2. Testing (Amarillo/Naranja) */}
           <ProgressBar 
-            className="testing-bar"
+            className="pending-bar"
             variant="warning" 
             now={(testing / total) * 100} 
             key={2}
@@ -90,7 +90,7 @@ const ProgressByFeatureCard = ({ features, normalizeTaskState }) => {
 
           {/* 3. Desarrollo (Azul) */}
           <ProgressBar 
-            className="development-bar"
+            className="inprogress-bar"
             variant="primary" 
             now={(development / total) * 100} 
             key={3}
@@ -98,14 +98,14 @@ const ProgressByFeatureCard = ({ features, normalizeTaskState }) => {
           />
 
           {/* 4. Pendientes (Gris/Secondary) */}
-          <ProgressBar 
-            className="pending-bar"
+          {/* <ProgressBar 
+            className="inprogress-bar"
             variant="secondary" 
             now={(pending / total) * 100} 
             key={4}
             style={{ opacity: 0.3 }}
             title={`${pending} Pendientes`}
-          />
+          /> */}
         </ProgressBar>
         
         {/* Leyenda de estados */}
@@ -113,7 +113,7 @@ const ProgressByFeatureCard = ({ features, normalizeTaskState }) => {
           <span className="text-success">● Listo: {completed}</span>
           <span className="text-warning">● Test: {testing}</span>
           <span className="text-primary">● Dev: {development}</span>
-          <span className="text-secondary">○ Pend: {pending}</span>
+          {/* <span className="text-secondary">○ Pend: {pending}</span> */}
         </div>
       </div>
     );
