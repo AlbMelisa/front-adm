@@ -2,14 +2,31 @@
   background: #ddc6ef;
   min-height: 100vh;
 }
-.button-login{
+/* ... tus estilos anteriores ... */
+
+.button-login {
   background-color: #410363;
   border-color: #410363;
+  transition: all 0.3s ease; /* Suaviza el cambio de color */
 }
-.button-login:hover{
-  background-color: #666;
-    border-color: #410363;
 
+.button-login:hover {
+  background-color: #666;
+  border-color: #410363;
+}
+
+/* ⭐ LO QUE TE FALTA: Estilo cuando está cargando/deshabilitado */
+.button-login:disabled {
+  background-color: #8c6a9e; /* Un morado más claro o gris */
+  border-color: #8c6a9e;
+  cursor: not-allowed; /* Cambia el cursor para indicar espera */
+  opacity: 0.7; /* Lo hace ver un poco transparente */
+}
+
+/* ⭐ IMPORTANTE: Evitar que el hover funcione si está deshabilitado */
+.button-login:disabled:hover {
+  background-color: #8c6a9e; /* Mantiene el color de disabled */
+  border-color: #8c6a9e;
 }
 .login-card {
   width: 450px;

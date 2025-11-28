@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import DeleteButton from "../deleteButton/DeleteButton";
 import ModalProject from "../modalProject/ModalProject";
-
+import './listProjects.css'
 const ListProjects = () => {
   const navigate = useNavigate();
   const [proyectos, setProyectos] = useState([]);
@@ -285,8 +285,8 @@ const ListProjects = () => {
                       </td>
                       <td>{project.teamNumber}</td>
                       <td>
-                        <Dropdown>
-                          <Dropdown.Toggle variant="warning" size="sm">
+                        <Dropdown >
+                          <Dropdown.Toggle className="list-button" size="sm">
                             Opciones
                           </Dropdown.Toggle>
 
@@ -362,7 +362,7 @@ const ListProjects = () => {
           </Table>
 
           {proyectosFiltrados.length > 0 && (
-            <Pagination className="justify-content-center">
+            <Pagination className="justify-content-center custom-pagination">
               <Pagination.Prev
                 disabled={paginaActual === 1}
                 onClick={() => handlePagina(paginaActual - 1)}
@@ -370,6 +370,7 @@ const ListProjects = () => {
 
               {[...Array(totalPaginas)].map((_, i) => (
                 <Pagination.Item
+                
                   key={i + 1}
                   active={i + 1 === paginaActual}
                   onClick={() => handlePagina(i + 1)}

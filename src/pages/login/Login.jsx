@@ -109,7 +109,6 @@ const Login = () => {
               {/* BOTÓN */}
               <Button
                 type="submit"
-                variant="primary"
                 className="w-100 mb-3 button-login"
                 disabled={loading}
               >
