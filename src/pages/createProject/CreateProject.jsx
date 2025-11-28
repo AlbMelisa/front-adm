@@ -19,27 +19,26 @@ const CreateProject = () => {
         const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:5111/api/Clients/getAll", {
           headers: {
-            "Authorization": `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!res.ok) throw new Error("Error al obtener clientes");
 
         const data = await res.json();
-        
-        if (data.clientsRegistered) {
-             setClientesList(data.clientsRegistered);
-        } else {
-             setClientesList([]);
-        }
 
+        if (data.clientsRegistered) {
+          setClientesList(data.clientsRegistered);
+        } else {
+          setClientesList([]);
+        }
       } catch (err) {
         console.error("Error cargando clientes:", err.message);
         showAlertMessage("Error al cargar la lista de clientes", "danger");
-      } 
+      }
     };
 
-    fetchClients(); 
+    fetchClients();
   }, []);
 
   // 2. Cargar Equipos
@@ -49,24 +48,23 @@ const CreateProject = () => {
         const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:5111/api/Teams", {
           headers: {
-            "Authorization": `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!res.ok) throw new Error("Error al obtener team");
 
         const data = await res.json();
-        
-        if (data.teamsRegistered) {
-            setTeam(data.teamsRegistered);
-        } else {
-            setTeam([]);
-        }
 
+        if (data.teamsRegistered) {
+          setTeam(data.teamsRegistered);
+        } else {
+          setTeam([]);
+        }
       } catch (err) {
         console.error("Error cargando equipos:", err.message);
         showAlertMessage("Error al cargar la lista de equipos", "danger");
-      } 
+      }
     };
 
     fetchTeam();
@@ -77,10 +75,13 @@ const CreateProject = () => {
     setAlertMessage(message);
     setAlertVariant(variant);
     setShowAlert(true);
-    
-    setTimeout(() => {
-      setShowAlert(false);
-    }, variant === "success" ? 5000 : 7000);
+
+    setTimeout(
+      () => {
+        setShowAlert(false);
+      },
+      variant === "success" ? 5000 : 7000
+    );
   };
 
   // Configuración de react-hook-form con todas las validaciones
@@ -91,7 +92,7 @@ const CreateProject = () => {
     formState: { errors, isSubmitting, isValid },
     watch,
     trigger,
-    setValue
+    setValue,
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -104,7 +105,7 @@ const CreateProject = () => {
       priorityProject: "",
       budgetProject: "0.00",
       functions: [],
-    }
+    },
   });
 
   // Campo dinámico para FUNCTIONS
@@ -122,31 +123,31 @@ const CreateProject = () => {
     if (!value) return null;
     const [day, month, year] = value.split("/");
     // Asegurar formato correcto: "2026-05-20T00:00:00"
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`;
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T00:00:00`;
   };
 
   // Validación personalizada para fecha futura
   const validateFutureDate = (value) => {
     if (!value) return true;
-    
+
     // Validar formato
     const regex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!regex.test(value)) return "Formato inválido (use dd/mm/aaaa)";
-    
+
     // Validar fecha real
-    const [day, month, year] = value.split('/');
+    const [day, month, year] = value.split("/");
     const inputDate = new Date(year, month - 1, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (inputDate.getMonth() + 1 !== parseInt(month)) {
       return "Fecha inválida";
     }
-    
+
     if (inputDate <= today) {
       return "La fecha debe ser futura";
     }
-    
+
     return true;
   };
 
@@ -164,10 +165,10 @@ const CreateProject = () => {
       dataEnd: convertDate(formData.dataEnd),
       priorityProject: parseInt(formData.priorityProject),
       budgetProject: parseFloat(formData.budgetProject),
-      functions: formData.functions.map(func => ({
+      functions: formData.functions.map((func) => ({
         functionName: func.functionName?.trim() || "",
-        functionDescription: func.functionDescription?.trim() || ""
-      }))
+        functionDescription: func.functionDescription?.trim() || "",
+      })),
     };
 
     // Debug: ver qué se está enviando
@@ -175,7 +176,7 @@ const CreateProject = () => {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         showAlertMessage("No hay token de autenticación", "danger");
         return;
@@ -185,8 +186,8 @@ const CreateProject = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": `Bearer ${token}`
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -196,7 +197,7 @@ const CreateProject = () => {
         try {
           const errorText = await response.text();
           console.error("Respuesta del servidor:", errorText);
-          
+
           if (errorText) {
             const errorData = JSON.parse(errorText);
             errorMsg = errorData.message || errorData.title || errorMsg;
@@ -209,13 +210,12 @@ const CreateProject = () => {
 
       const result = await response.json();
       console.log("Respuesta exitosa:", result);
-      
+
       showAlertMessage("¡Proyecto creado exitosamente!", "success");
-      
+
       setTimeout(() => {
         navigate("/projectslist");
       }, 2000);
-
     } catch (err) {
       console.error("Error al crear proyecto:", err);
       showAlertMessage("Error al crear proyecto: " + err.message, "danger");
@@ -225,10 +225,10 @@ const CreateProject = () => {
   return (
     <Container className="p-4 my-5 shadow-lg container-form">
       {/* Alert de Bootstrap */}
-      <Alert 
-        show={showAlert} 
-        variant={alertVariant} 
-        dismissible 
+      <Alert
+        show={showAlert}
+        variant={alertVariant}
+        dismissible
         onClose={() => setShowAlert(false)}
         className="mt-3"
       >
@@ -248,21 +248,21 @@ const CreateProject = () => {
                 Nombre del Proyecto <span className="text-danger">*</span>
               </Form.Label>
               <Form.Control
-              className="form-color"
+                className="form-color"
                 {...register("nameProject", {
                   required: "El nombre del proyecto es obligatorio",
                   minLength: {
                     value: 3,
-                    message: "El nombre debe tener al menos 3 caracteres"
+                    message: "El nombre debe tener al menos 3 caracteres",
                   },
                   maxLength: {
                     value: 100,
-                    message: "El nombre no puede exceder 100 caracteres"
+                    message: "El nombre no puede exceder 100 caracteres",
                   },
                   pattern: {
                     value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
-                    message: "El nombre contiene caracteres no válidos"
-                  }
+                    message: "El nombre contiene caracteres no válidos",
+                  },
                 })}
                 type="text"
                 placeholder="Nombre del proyecto"
@@ -283,10 +283,11 @@ const CreateProject = () => {
                 Equipo <span className="text-danger">*</span>
               </Form.Label>
               <Form.Select
-              className="form-color"
+                className="form-color"
                 {...register("teamNumber", {
                   required: "Debe seleccionar un equipo",
-                  validate: value => value !== "" || "Seleccione un equipo válido"
+                  validate: (value) =>
+                    value !== "" || "Seleccione un equipo válido",
                 })}
                 isInvalid={!!errors.teamNumber}
               >
@@ -311,7 +312,7 @@ const CreateProject = () => {
                 Descripción del Proyecto <span className="text-danger">*</span>
               </Form.Label>
               <Form.Control
-              className="form-color"
+                className="form-color"
                 as="textarea"
                 rows={3}
                 placeholder="Describa el proyecto"
@@ -319,12 +320,12 @@ const CreateProject = () => {
                   required: "La descripción es obligatoria",
                   minLength: {
                     value: 10,
-                    message: "La descripción debe tener al menos 10 caracteres"
+                    message: "La descripción debe tener al menos 10 caracteres",
                   },
                   maxLength: {
                     value: 50,
-                    message: "La descripción no puede exceder 50 caracteres"
-                  }
+                    message: "La descripción no puede exceder 50 caracteres",
+                  },
                 })}
                 isInvalid={!!errors.descriptionProject}
               />
@@ -347,19 +348,25 @@ const CreateProject = () => {
                 <Row className="mb-2">
                   <Col>
                     <Form.Control
-                    className="form-color"
+                      className="form-color"
                       type="text"
                       placeholder="Nombre de la funcionalidad"
                       {...register(`functions.${index}.functionName`, {
-                        required: "El nombre de la funcionalidad es obligatorio",
+                        required:
+                          "El nombre de la funcionalidad es obligatorio",
                         minLength: {
                           value: 3,
-                          message: "Mínimo 3 caracteres"
+                          message: "Mínimo 3 caracteres",
                         },
                         maxLength: {
                           value: 50,
-                          message: "Máximo 50 caracteres"
-                        }
+                          message: "Máximo 50 caracteres",
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                          message:
+                            "La funcionalidad contiene caracteres no válidos",
+                        },
                       })}
                       isInvalid={!!errors.functions?.[index]?.functionName}
                     />
@@ -381,20 +388,21 @@ const CreateProject = () => {
                 </Row>
 
                 <Form.Control
-                className="form-control"
+                  className="form-control"
                   as="textarea"
                   rows={2}
                   placeholder="Descripción de la funcionalidad"
                   {...register(`functions.${index}.functionDescription`, {
-                    required: "La descripción de la funcionalidad es obligatoria",
+                    required:
+                      "La descripción de la funcionalidad es obligatoria",
                     minLength: {
                       value: 5,
-                      message: "Mínimo 5 caracteres"
+                      message: "Mínimo 5 caracteres",
                     },
                     maxLength: {
-                      value: 200,
-                      message: "Máximo 200 caracteres"
-                    }
+                      value: 150,
+                      message: "Máximo 150 caracteres",
+                    },
                   })}
                   isInvalid={!!errors.functions?.[index]?.functionDescription}
                 />
@@ -427,10 +435,11 @@ const CreateProject = () => {
                 Cliente <span className="text-danger">*</span>
               </Form.Label>
               <Form.Select
-              className="form-color"
+                className="form-color"
                 {...register("clientName", {
                   required: "Debe seleccionar un cliente",
-                  validate: value => value !== "" || "Seleccione un cliente válido"
+                  validate: (value) =>
+                    value !== "" || "Seleccione un cliente válido",
                 })}
                 isInvalid={!!errors.clientName}
               >
@@ -453,10 +462,11 @@ const CreateProject = () => {
                 Tipo de Proyecto <span className="text-danger">*</span>
               </Form.Label>
               <Form.Select
-              className="form-color"
+                className="form-color"
                 {...register("typeProject", {
                   required: "Seleccione un tipo de proyecto",
-                  validate: value => value !== "" || "Seleccione un tipo válido"
+                  validate: (value) =>
+                    value !== "" || "Seleccione un tipo válido",
                 })}
                 isInvalid={!!errors.typeProject}
               >
@@ -475,12 +485,15 @@ const CreateProject = () => {
         <Row className="mb-4">
           <Col md={4}>
             <Form.Group controlId="priorityProject">
-              <Form.Label>Prioridad <span className="text-danger">*</span></Form.Label>
+              <Form.Label>
+                Prioridad <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
-              className="form-color"
+                className="form-color"
                 {...register("priorityProject", {
                   required: "Seleccione una prioridad",
-                  validate: value => value !== "" || "Seleccione una prioridad válida"
+                  validate: (value) =>
+                    value !== "" || "Seleccione una prioridad válida",
                 })}
                 isInvalid={!!errors.priorityProject}
               >
@@ -499,11 +512,11 @@ const CreateProject = () => {
             <Form.Group controlId="dataEnd">
               <Form.Label>Fecha de Fin</Form.Label>
               <Form.Control
-              className="form-color"
+                className="form-color"
                 type="text"
                 placeholder="dd/mm/aaaa"
                 {...register("dataEnd", {
-                  validate: validateFutureDate
+                  validate: validateFutureDate,
                 })}
                 isInvalid={!!errors.dataEnd}
               />
@@ -518,9 +531,11 @@ const CreateProject = () => {
 
           <Col md={4}>
             <Form.Group controlId="budgetProject">
-              <Form.Label>Presupuesto Total <span className="text-danger">*</span></Form.Label>
+              <Form.Label>
+                Presupuesto Total <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
-               className="form-color form-control"
+                className="form-color form-control"
                 type="number"
                 step="0.01"
                 min="0.01"
@@ -529,30 +544,28 @@ const CreateProject = () => {
                   required: "Ingrese un monto válido",
                   min: {
                     value: 0.01,
-                    message: "El presupuesto debe ser mayor a 0"
+                    message: "El presupuesto debe ser mayor a 0",
                   },
                   max: {
                     value: 100000000,
-                    message: "El presupuesto no puede exceder los 100,000,000"
+                    message: "El presupuesto no puede exceder los 100,000,000",
                   },
-                  valueAsNumber: true
+                  valueAsNumber: true,
                 })}
                 isInvalid={!!errors.budgetProject}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.budgetProject?.message}
               </Form.Control.Feedback>
-              <Form.Text className="text-muted">
-                Máximo: 100,000,000
-              </Form.Text>
+              <Form.Text className="text-muted">Máximo: 100,000,000</Form.Text>
             </Form.Group>
           </Col>
         </Row>
 
         {/* BOTONES */}
         <div className="mt-4">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="me-3 create-btn-custom"
             disabled={isSubmitting}
           >
