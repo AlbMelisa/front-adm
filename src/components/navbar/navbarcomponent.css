@@ -1,0 +1,211 @@
+/* Estilo del contenedor principal */
+/*.custom-navbar {
+    /* Fondo blanco con un borde inferior muy fino, como en la imagen 
+    background-color: white !important;
+    border-bottom: 1px solid #e0e0e0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+} 
+
+/* --------------------------------------
+   ESTILOS DE LOGO
+   -------------------------------------- 
+.logo-placeholder {
+    /* Estilos del rombo azul del logo "SS Mobile" 
+    width: 30px;
+    height: 30px;
+    background-color: #2c7be5; /* Color azul 
+    border-radius: 5px;
+    /* Simula el diseño del logo con un pequeño borde 
+    border: 2px solid white; 
+    box-shadow: 0 0 0 1px #2c7be5; 
+    position: relative;
+}
+
+.small-text {
+    font-size: 0.75rem; /* Texto pequeño para "SS Mobile" 
+    color: #555;
+}
+
+/* --------------------------------------
+   ESTILOS DE CENTRADO (Bienvenido "Mauro")
+   -------------------------------------- 
+.welcome-message {
+    /* Usa margin auto para forzar el centrado horizontal 
+    margin: 0 auto; 
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.person-icon-placeholder {
+    /* Estilos del ícono de persona (azul y redondo) 
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #2c7be5; /* Azul 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Simula el icono interior 
+    border: 3px solid white; 
+    box-shadow: 0 0 0 1px #2c7be5; 
+}
+
+/* --------------------------------------
+   ESTILOS DE CERRAR SESIÓN
+   -------------------------------------- 
+.logout-link {
+    color: #333 !important;
+    text-decoration: none !important;
+    font-size: 0.9rem;
+    padding: 0 !important; /* Elimina padding extra de Nav.Link 
+}
+
+.logout-icon-placeholder {
+    /* Estilos del ícono de Cerrar Sesión (ejemplo simple de caja) 
+    width: 18px;
+    height: 18px;
+    border: 1px solid #555; 
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 5px;
+}*/
+
+/* --- NAV SUPERIOR --- */
+
+.navbar-gym {
+  background-color: #ffffff;
+  height: 85px;
+  padding: 0 20px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  align-items: center;
+}
+
+/* IZQUIERDA: LOGO + TITULOS */
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.navbar-title .title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #222;
+}
+
+.navbar-title .subtitle {
+  font-size: 12px;
+  color: #777;
+  margin-top: -3px;
+  display: block;
+}
+
+/* CENTRO: ocupa espacio flexible */
+.navbar-center {
+  flex: 1 1 auto;
+}
+
+/* DERECHA: CAJITA DE USUARIO + LOGOUT */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* La caja blanca/pill que contiene el avatar y datos */
+.navbar-user-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+  border: 1px solid #f0f0f0;
+}
+
+/* Avatar morado circular */
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #882AB3, #882AB3); /* morado degradé */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-icon {
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Texto del usuario */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #7a7a7a;
+  margin-top: -2px;
+}
+
+/* Botón de logout (pequeño, sin estilo por defecto) */
+.logout-button {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: background 0.12s, color 0.12s, transform 0.08s;
+}
+
+/* hover */
+.logout-button:hover {
+  background: #f4f4f7;
+  color: #333;
+  transform: translateX(2px);
+}
+
+/* focus accesible */
+.logout-button:focus {
+  outline: 2px solid rgb(136, 42, 179);
+  outline-offset: 2px;
+}
+/* En tu archivo navbarcomponent.css */
+
+.navbar-logo .logo-icon {
+  /* TAMAÑO: Dale un tamaño visible */
+  font-size: 2.2rem; /* (o 36px) Prueba ajustar esto */
+  
+  /* COLOR: Dale un color que contraste con tu navbar */
+  color: #2d2929; /* (Asumiendo que tu navbar es oscura) */
+  
+  /* Un poco de espacio */
+  margin-right: 12px; 
+}

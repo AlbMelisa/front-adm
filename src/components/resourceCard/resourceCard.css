@@ -1,0 +1,42 @@
+/* ResourceCard.css */
+/* (Asegúrate de importar también StatCard.css o un CSS 
+   global que tenga el estilo de .stat-card) 
+*/
+
+.resource-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #495057; /* Un gris un poco más oscuro que text-muted */
+}
+
+/* El punto de color */
+.resource-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+/* Colores de los puntos (basados en la imagen original) */
+.dot-humanos {
+  background-color: #5e18ff;
+} 
+
+.dot-materiales {
+  background-color:  #7c18ff;
+} 
+
+.dot-tecnologicos {
+  background-color: #aa18ff;
+} 
+
+.dot-financieros {
+  background-color: #ff18d8;
+} /* Verde */

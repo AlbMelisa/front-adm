@@ -1,0 +1,73 @@
+/* Fondo general */
+.home-container {
+  background-color: #f5e8ff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #5b21b6;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+}
+
+/* Encabezado */
+.home-header {
+  margin-bottom: 40px;
+}
+
+.home-icon {
+  color: #a855f7;
+  margin-bottom: 10px;
+}
+
+.home-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.home-header p {
+  font-size: 1.1rem;
+  color: #8b5cf6;
+}
+
+/* Tarjetas */
+.home-cards {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  background-color: #f8f5ff;
+  border-radius: 16px;
+  padding: 30px;
+  width: 260px;
+  box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(168, 85, 247, 0.35);
+}
+
+.card-icon {
+  color: #a855f7;
+  margin-bottom: 10px;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card p {
+  font-size: 0.95rem;
+  color: #7c3aed;
+}

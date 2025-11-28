@@ -1,0 +1,52 @@
+.sidebar {
+  width: 230px;
+  background-color: #422370;
+  color: white;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+.sidebar-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+/* Menú principal */
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Cada opción */
+.menu-item {
+  border-radius: 12px;
+  transition: background-color 0.3s;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #e9d5ff;
+  padding: 12px 15px;
+}
+
+/* Hover */
+.menu-item:hover {
+  background-color: #6d28d9;
+}
+
+/* Opción seleccionada */
+.menu-selected {
+  background-color: #a21caf;
+}
+
+.menu-selected .menu-link {
+  color: white;
+}

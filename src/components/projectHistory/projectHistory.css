@@ -1,0 +1,198 @@
+/* projectHistory.css - estilos personalizados (no usamos Card) */
+
+.ph-root {
+  padding: 18px;
+  background: #ffffff;
+}
+
+/* Top info grid */
+.ph-top-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.ph-box {
+  background: #fbfbfc;
+  border: 1px solid #eef0f3;
+  border-radius: 12px;
+  padding: 18px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ph-box-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.ph-box-value {
+  font-weight: 700;
+  font-size: 22px;
+  color: #111827;
+}
+
+/* Description */
+.ph-description {
+  background: #fbfbfc;
+  border: 1px solid #eef0f3;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.ph-subtitle {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.ph-desc-text {
+  color: #6b7280;
+}
+
+/* Timeline wrapper */
+.ph-timeline-wrapper {
+  position: relative;
+  padding-left: 36px;
+  margin-top: 12px;
+}
+
+/* Vertical line */
+.ph-timeline-line {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  background: linear-gradient(#e6eefc, #e6eefc);
+  border-radius: 3px;
+}
+
+/* Events container */
+.ph-events {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-height: 600px; /* ajustable */
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Single event */
+.ph-event {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ph-event-marker {
+  width: 36px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.ph-dot {
+  width: 12px;
+  height: 12px;
+  background: #d1d5db;
+  border-radius: 50%;
+  margin-top: 6px;
+  box-shadow: 0 0 0 4px rgba(209,213,219,0.15);
+}
+
+.ph-dot-primary {
+  background: #0b5fff;
+  box-shadow: 0 0 0 6px rgba(11,95,255,0.08);
+}
+
+/* Event body (the card-like area) */
+.ph-event-body {
+  background: #ffffff;
+  border: 1px solid #eef0f3;
+  padding: 16px;
+  border-radius: 10px;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+}
+
+/* Meta row */
+.ph-event-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ph-event-date {
+  font-size: 13px;
+  color: #374151;
+  background: #f8fafc;
+  border: 1px solid #eef2ff;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.ph-event-budget {
+  font-size: 13px;
+  color: #ffffff;
+  background: #0b5fff;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+/* Sections */
+.ph-event-section {
+  margin-top: 8px;
+}
+
+.ph-section-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ph-functions {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.ph-fn {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.0);
+  border-radius: 6px;
+}
+
+.ph-fn-name {
+  font-weight: 700;
+}
+
+.ph-fn-desc {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Images reference */
+.ph-images {
+  margin-top: 18px;
+}
+
+.ph-image-row img {
+  max-width: 240px;
+  margin-right: 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .ph-top-grid { grid-template-columns: 1fr; }
+  .ph-timeline-wrapper { padding-left: 28px; }
+  .ph-event-body { padding: 12px; }
+}

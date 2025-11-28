@@ -1,0 +1,78 @@
+.login-page-container {
+  background: #ddc6ef;
+  min-height: 100vh;
+}
+/* ... tus estilos anteriores ... */
+
+.button-login {
+  background-color: #410363;
+  border-color: #410363;
+  transition: all 0.3s ease; /* Suaviza el cambio de color */
+}
+
+.button-login:hover {
+  background-color: #666;
+  border-color: #410363;
+}
+
+/* ⭐ LO QUE TE FALTA: Estilo cuando está cargando/deshabilitado */
+.button-login:disabled {
+  background-color: #8c6a9e; /* Un morado más claro o gris */
+  border-color: #8c6a9e;
+  cursor: not-allowed; /* Cambia el cursor para indicar espera */
+  opacity: 0.7; /* Lo hace ver un poco transparente */
+}
+
+/* ⭐ IMPORTANTE: Evitar que el hover funcione si está deshabilitado */
+.button-login:disabled:hover {
+  background-color: #8c6a9e; /* Mantiene el color de disabled */
+  border-color: #8c6a9e;
+}
+.login-card {
+  width: 450px;
+  border-radius: 14px;
+  border: none;
+}
+
+.login-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  background: #33005c;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.login-main-icon {
+  color: white;
+  font-size: 32px;
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: #666;
+}
+
+.register-link {
+  color: #c71d1d;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+input.form-control {
+  padding: 10px;
+}
+
+.small-text-login {
+  font-size: 14px;
+}

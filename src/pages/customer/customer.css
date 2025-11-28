@@ -1,0 +1,75 @@
+.customer-container {
+  background-color: #f5e8ff;
+  min-height: 100vh;
+  color: #5b21b6;
+  font-family: "Poppins", sans-serif;
+  padding: 25px;
+}
+
+/* Título */
+.customer-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Tarjeta del buscador */
+.customer-search-card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.search-icon {
+  background: none;
+  border-right: none;
+}
+
+/* Tarjeta de la tabla */
+.customer-table-card {
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Tabla */
+.customer-table th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.customer-table td,
+.customer-table th {
+  padding: 14px 18px;
+  vertical-align: middle;
+}
+
+/* Nombre */
+.customer-name {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Badge proyectos */
+.customer-badge {
+  background-color: #f3e8ff !important;
+  color: #7c3aed !important;
+}
+
+/* Botón "Ver Historial" */
+.btn-historial {
+  background-color: #facc15;
+  border: none;
+  color: #000;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.btn-historial:hover {
+  background-color: #eab308;
+  color: black;
+}
+
+/* Sombra suave */
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}

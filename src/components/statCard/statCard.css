@@ -1,0 +1,25 @@
+
+.stat-card {
+  border: none;
+  border-radius: 0.75rem; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Sombra muy sutil */
+  background-color: #f5f4f4;
+
+}
+
+/* Título superior (ej. "Tareas Completadas") */
+.card-title-muted {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #080b0e; /* Un gris estándar (text-muted) */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Número grande (ej. "2") */
+.display-6 {
+  font-size: 2.5rem; /* Tamaño del número */
+  font-weight: 700 !important; /* Asegura que sea 'bold' */
+  color: #212529; /* Color de texto oscuro */
+  margin-bottom: 0.25rem; /* Espacio antes de la descripción */
+}

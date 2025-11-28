@@ -1,0 +1,43 @@
+.list-button {
+  background-color: #a654d2 !important; /* El !important fuerza el cambio */
+  border-color: #410363 !important;
+  color: white !important; /* Asegura que el texto se vea */
+}
+
+/* Y para el hover */
+.list-button:hover {
+  background-color: #252222 !important;
+  border-color: #410363 !important;
+}
+/* 1. Color del texto de los números (cuando no están activos) */
+.custom-pagination .page-link {
+  color: #410363; /* Tu color morado */
+  border: 1px solid #dee2e6;
+  background-color: white;
+}
+
+/* 2. Estilo cuando pasas el mouse por encima (Hover) */
+.custom-pagination .page-link:hover {
+  color: white;
+  background-color: #666; /* Tu gris oscuro */
+  border-color: #666;
+}
+
+/* 3. Estilo del número ACTIVO (La página actual) */
+.custom-pagination .page-item.active .page-link {
+  background-color: #410363 !important; /* !important asegura que gane */
+  border-color: #410363 !important;
+  color: white !important;
+}
+
+/* 4. Quitar el foco azul brillante al hacer clic (Opcional pero recomendado) */
+.custom-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.25rem rgba(65, 3, 99, 0.25); /* Sombra morada suave */
+}
+
+/* 5. Estilo para los botones deshabilitados (Prev/Next cuando no se pueden usar) */
+.custom-pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+}

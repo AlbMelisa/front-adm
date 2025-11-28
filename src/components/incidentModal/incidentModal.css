@@ -1,0 +1,55 @@
+/* Botón Cancelar */
+/*.btn-cancelar-incidencia {
+  background-color: #d4a1ec !important;   
+  color: white !important;
+  border: none !important;
+}
+
+.btn-cancelar-incidencia:hover {
+  background-color: #b499e7 !important;
+}
+*/
+/* Botón Registrar */
+.btn-registrar-incidencia {
+  background-color: #a719d2 !important;   /* azul */
+  color: white !important;
+  border: none !important;
+}
+
+.btn-registrar-incidencia:hover {
+  background-color: #5e0da1 !important;
+}
+
+.text-warning{
+  color: #a719d2  !important;
+}
+
+
+.accordion-item {
+  background-color: #ffffff !important; /* tu morado claro */
+ 
+  border-radius: 12px !important;
+}
+
+
+.accordion-button.collapsed {
+  background-color: #ffffff !important; 
+  color: #000000 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+
+.incidencias-header .accordion-button:not(.collapsed) {
+  background-color: #e8c6ff !important; /* morado un poco más fuerte */
+  color: #3d0066 !important;
+  box-shadow: none !important;
+}
+
+/* Quitar borde azul */
+.incidencias-header .accordion-button:focus {
+  box-shadow: none !important;
+  border-color: #a719d2 !important;
+}
+
+

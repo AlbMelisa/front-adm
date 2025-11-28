@@ -1,0 +1,119 @@
+/* Estilos para las tarjetas personalizadas */
+.pr-card-custom {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pr-card-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el gráfico personalizado */
+.pr-chart-custom {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+/* Estilos para los proyectos personalizados */
+.pr-project-custom {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pr-project-custom:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mantén los estilos existentes y añade estos */
+.pr-metric-title {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.pr-metric-value {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.pr-metric-sub {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.pr-project-title {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.pr-state-badge {
+  display: inline-block;
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.pr-date {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.pr-progressbar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.pr-chart-wrapper {
+  height: 300px;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pr-card-custom {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .pr-metric-value {
+    font-size: 24px;
+  }
+  
+  .pr-project-custom {
+    padding: 16px;
+  }
+}
+.completed-bar {
+  background-color: #7d18c0 !important; /* verde */
+}
+
+.inprogress-bar  {
+  background-color: rgb(206, 116, 231) !important; /* azul */
+}
+
+.pending-bar {
+  background-color: #9e9e9e !important; /* gris */
+}

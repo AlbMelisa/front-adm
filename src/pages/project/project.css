@@ -1,0 +1,133 @@
+/* --- Estilo General --- */
+body {
+  background-color: #f7f7fe; /* Color de fondo general (ligeramente púrpura) */
+}
+
+.dashboard-container {
+  max-width: 1600px;
+}
+
+/* --- Estilo de Tarjetas (Cards) --- */
+.card {
+  border: none;
+  border-radius: 0.75rem; /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Sombra suave */
+  height: 100%;
+}
+
+.card-title-muted {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d; /* text-muted */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.display-6 {
+  font-size: 2.5rem; /* Números grandes en las tarjetas de stats */
+}
+
+/* --- Estilo de la Barra de Progreso --- */
+.progress,
+.progress-bar {
+  border-radius: 0.25rem;
+}
+.progress {
+  height: 0.75rem;
+  background-color: #e9ecef;
+}
+.progress-bar.bg-dark {
+  background-color: #212529 !important;
+}
+
+/* --- Estilo Lista de Recursos Asignados --- */
+.resource-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.resource-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+/* Colores de los puntos (basados en la imagen) */
+.dot-humanos {
+  background-color: #4285f4;
+} /* Azul */
+.dot-materiales {
+  background-color: #fbbc05;
+} /* Amarillo/Naranja */
+.dot-tecnologicos {
+  background-color: #9333ea;
+} /* Púrpura */
+.dot-financieros {
+  background-color: #34a853;
+} /* Verde */
+
+/* --- Estilo del Acordeón --- */
+.feature-accordion .accordion-item {
+  border: none;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden; /* Para que el header redondeado funcione */
+}
+
+.feature-accordion .accordion-header .accordion-button {
+  background-color: #ffffff;
+  color: #212529;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
+  font-weight: 500;
+}
+
+/* Ocultar la flecha por defecto del acordeón */
+.feature-accordion .accordion-button::after {
+  display: none;
+}
+
+/* Rotar nuestra flecha personalizada */
+.accordion-caret {
+  transition: transform 0.2s ease-in-out;
+  color: #6c757d;
+}
+
+.feature-accordion .accordion-button:not(.collapsed) .accordion-caret {
+  transform: rotate(90deg);
+}
+
+/* Estilo de los iconos de acción en el header */
+.icon-action {
+  font-size: 0.9rem;
+  transition: color 0.15s ease-in-out;
+}
+
+.icon-action:hover {
+  color: #000000 !important; /* Color al pasar el mouse */
+}
+
+.new-proyect {
+  background-color: #7c1fc9;
+  color: #e9ecef;
+  border: none;
+}
+
+.new-proyect:hover {
+  background-color: #ad65f0;
+  color: #e9ecef;
+  border: none;
+}
+/* Evitar que los iconos activen el acordeón (opcional, requiere JS) */
+/* Para una réplica visual simple, esto es suficiente. */
+/* Si quisieras que los botones NO abran el acordeón, */
+/* necesitarías agregar onClick={(e) => e.stopPropagation()} a cada icono. */
