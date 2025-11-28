@@ -8,15 +8,22 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   InputGroup,
-  Alert
+  Alert,
 } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import '../../pages/createProject/createProject.css'
+import "../../pages/createProject/createProject.css";
 
 const priorityMapToApi = { Baja: 0, Media: 1, Alta: 2 };
 const priorityMapFromApi = { 0: "Baja", 1: "Media", 2: "Alta" };
 
-const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTaskAdded }) => {
+const CreateTaskModal = ({
+  show,
+  onHide,
+  idFunction,
+  taskData,
+  isLoading,
+  onTaskAdded,
+}) => {
   const isEditMode = !!taskData;
   const [allResources, setAllResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
@@ -33,7 +40,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
     setValue,
     watch,
     trigger,
-    clearErrors
+    clearErrors,
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -41,8 +48,8 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       taskDescription: "",
       dateEnd: "",
       priority: "Media",
-      assignedResources: []
-    }
+      assignedResources: [],
+    },
   });
 
   // Watch para contadores de caracteres
@@ -69,39 +76,39 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
     if (!value) {
       return "La fecha límite es obligatoria";
     }
-    
+
     const selectedDate = new Date(value);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate < today) {
       return "La fecha no puede ser anterior a hoy";
     }
-    
+
     return true;
   };
 
   const getMinDate = () => {
     const today = new Date();
-    return today.toISOString().split('T')[0];
+    return today.toISOString().split("T")[0];
   };
 
   const verifyToken = () => {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       return { isValid: false, message: "No hay token de autenticación" };
     }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const isExpired = payload.exp * 1000 < Date.now();
-      
+
       if (isExpired) {
         localStorage.removeItem("token");
         return { isValid: false, message: "Token expirado" };
       }
-      
+
       return { isValid: true, token };
     } catch (parseError) {
       localStorage.removeItem("token");
@@ -119,13 +126,15 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
 
       const resp = await fetch("http://localhost:5111/api/Resource/", {
         headers: {
-          "Authorization": `Bearer ${tokenValidation.token}`
-        }
+          Authorization: `Bearer ${tokenValidation.token}`,
+        },
       });
 
       if (resp.status === 401) {
         localStorage.removeItem("token");
-        setResourcesError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        setResourcesError(
+          "Sesión expirada. Por favor, inicia sesión nuevamente."
+        );
         return;
       }
 
@@ -134,7 +143,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       }
 
       const data = await resp.json();
-      
+
       let resourcesList = [];
       if (Array.isArray(data)) {
         resourcesList = data;
@@ -145,11 +154,11 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       } else if (data.data && Array.isArray(data.data)) {
         resourcesList = data.data;
       }
-      
-      setAllResources(resourcesList);
-      if (resourcesList.length > 0) setSelectedResource(resourcesList[0].idResource);
-      setResourcesError(null);
 
+      setAllResources(resourcesList);
+      if (resourcesList.length > 0)
+        setSelectedResource(resourcesList[0].idResource);
+      setResourcesError(null);
     } catch (error) {
       console.error("Error cargando recursos:", error);
       setResourcesError(error.message);
@@ -162,17 +171,23 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
 
       if (isEditMode && taskData) {
         setValue("taskName", taskData.taskName || taskData.nombre || "");
-        setValue("taskDescription", taskData.taskDescription || taskData.descripcion || "");
-        
+        setValue(
+          "taskDescription",
+          taskData.taskDescription || taskData.descripcion || ""
+        );
+
         let fDate = taskData.dateEnd || taskData.fechaFin || "";
-        if(fDate && fDate.includes("T")) fDate = fDate.split("T")[0];
+        if (fDate && fDate.includes("T")) fDate = fDate.split("T")[0];
         setValue("dateEnd", fDate);
 
         setValue("priority", priorityMapFromApi[taskData.priority] || "Media");
 
         const resources = taskData.resourceList || taskData.resource || [];
         setAssignedResources(Array.isArray(resources) ? resources : []);
-        setValue("assignedResources", Array.isArray(resources) ? resources : []);
+        setValue(
+          "assignedResources",
+          Array.isArray(resources) ? resources : []
+        );
       } else {
         resetForm();
       }
@@ -185,7 +200,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       taskDescription: "",
       dateEnd: "",
       priority: "Media",
-      assignedResources: []
+      assignedResources: [],
     });
     setAssignedResources([]);
     setResourcesError(null);
@@ -224,7 +239,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       taskDescription: data.taskDescription.trim(),
       priority: priorityMapToApi[data.priority],
       dateEnd: data.dateEnd,
-      resourceList: data.assignedResources
+      resourceList: data.assignedResources,
     };
 
     console.log("Enviando tarea:", payload);
@@ -232,11 +247,11 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
     try {
       const response = await fetch("http://localhost:5111/api/Task", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${tokenValidation.token}`
+          Authorization: `Bearer ${tokenValidation.token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (response.status === 401) {
@@ -250,18 +265,16 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
       }
 
       const result = await response.json();
-      
+
       setShowSuccessAlert(true);
-      
+
       // ✅ REFRESCAR LA PÁGINA DESPUÉS DE 1.5 SEGUNDOS
       setTimeout(() => {
         handleCloseAndReset();
         window.location.reload(); // 🔄 Esto refresca toda la página
       }, 1500);
-
     } catch (error) {
       console.error("Error:", error);
-      alert(`Error al crear la tarea: ${error.message}`);
     }
   };
 
@@ -282,9 +295,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
         <Modal.Body>
           {showSuccessAlert && (
             <Alert variant="success" className="mb-3">
-              <Alert.Heading className="h6 mb-1">
-                ✅ ¡Éxito!
-              </Alert.Heading>
+              <Alert.Heading className="h6 mb-1">✅ ¡Éxito!</Alert.Heading>
               <p className="mb-0">Tarea creada exitosamente</p>
               <small className="text-muted">
                 La página se refrescará automáticamente...
@@ -315,17 +326,18 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
               {...register("taskName", {
                 required: "El nombre de la tarea es obligatorio",
                 minLength: {
-                  value: 3,
-                  message: "El nombre debe tener al menos 3 caracteres"
+                  value: 5,
+                  message: "El nombre debe tener al menos 5 caracteres",
                 },
                 maxLength: {
                   value: 50,
-                  message: "El nombre no puede exceder 50 caracteres"
+                  message: "El nombre no puede exceder 50 caracteres",
                 },
                 pattern: {
-                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
-                  message: "El nombre contiene caracteres no válidos"
-                }
+                  value: /^(?![0-9]+$)[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                  message:
+                    "El nombre no puede contener solo números ni caracteres no válidos",
+                },
               })}
               isInvalid={!!errors.taskName}
               placeholder="Ingresa el nombre de la tarea"
@@ -348,22 +360,27 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
                 required: "La descripción es obligatoria",
                 minLength: {
                   value: 20,
-                  message: "La descripción debe tener al menos 20 caracteres"
+                  message: "La descripción debe tener al menos 20 caracteres",
                 },
                 maxLength: {
                   value: 150, // ✅ MÁXIMO 40 CARACTERES
-                  message: "La descripción no puede exceder 150 caracteres"
+                  message: "La descripción no puede exceder 150 caracteres",
                 },
                 pattern: {
-                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,!?()]+$/,
-                  message: "La descripción contiene caracteres no válidos"
+                  // (?=.*[a-zA-ZáéíóúÁÉÍÓÚñÑ]) -> Lookahead: Busca al menos una letra (con o sin tilde/ñ)
+                  // [\s\S]+ -> Permite CUALQUIER cosa (letras, números, saltos de línea, emojis, : / " ' etc.)
+                  value: /^(?=.*[a-zA-ZáéíóúÁÉÍÓÚñÑ])[\s\S]+$/,
+                  message:
+                    "La descripción debe contener texto explicativo, no solo números o símbolos",
                 },
                 validate: {
-                  notOnlySpaces: value => 
-                    value.trim().length > 0 || "La descripción no puede contener solo espacios",
-                  meaningfulContent: value => 
-                    value.trim().split(' ').length >= 3 || "La descripción debe ser más específica (mínimo 3 palabras)"
-                }
+                  notOnlySpaces: (value) =>
+                    value.trim().length > 0 ||
+                    "La descripción no puede contener solo espacios",
+                  meaningfulContent: (value) =>
+                    value.trim().split(" ").length >= 3 ||
+                    "La descripción debe ser más específica (mínimo 3 palabras)",
+                },
               })}
               isInvalid={!!errors.taskDescription}
               placeholder="Describe la tarea en detalle"
@@ -371,7 +388,11 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
             <Form.Control.Feedback type="invalid">
               {errors.taskDescription?.message}
             </Form.Control.Feedback>
-            <Form.Text className={`${watchTaskDescription.length > 40 ? 'text-danger' : 'text-muted'}`}>
+            <Form.Text
+              className={`${
+                watchTaskDescription.length > 40 ? "text-danger" : "text-muted"
+              }`}
+            >
               {watchTaskDescription.length}/150 caracteres
             </Form.Text>
           </Form.Group>
@@ -385,7 +406,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
                   type="date"
                   {...register("dateEnd", {
                     required: "La fecha límite es obligatoria",
-                    validate: validateFutureDate
+                    validate: validateFutureDate,
                   })}
                   isInvalid={!!errors.dateEnd}
                   min={getMinDate()}
@@ -403,7 +424,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
                   <input
                     type="hidden"
                     {...register("priority", {
-                      required: "La prioridad es obligatoria"
+                      required: "La prioridad es obligatoria",
                     })}
                   />
                   <ToggleButtonGroup
@@ -413,24 +434,36 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
                     onChange={(val) => setValue("priority", val)}
                     className="w-100 d-flex gap-2"
                   >
-                    <ToggleButton 
-                      id="priority-low" 
-                      value="Baja" 
-                      variant={watch("priority") === "Baja" ? "success" : "outline-success"}
+                    <ToggleButton
+                      id="priority-low"
+                      value="Baja"
+                      variant={
+                        watch("priority") === "Baja"
+                          ? "success"
+                          : "outline-success"
+                      }
                     >
                       Baja
                     </ToggleButton>
-                    <ToggleButton 
-                      id="priority-medium" 
-                      value="Media" 
-                      variant={watch("priority") === "Media" ? "primary" : "outline-primary"}
+                    <ToggleButton
+                      id="priority-medium"
+                      value="Media"
+                      variant={
+                        watch("priority") === "Media"
+                          ? "primary"
+                          : "outline-primary"
+                      }
                     >
                       Media
                     </ToggleButton>
-                    <ToggleButton 
-                      id="priority-high" 
-                      value="Alta" 
-                      variant={watch("priority") === "Alta" ? "warning" : "outline-warning"}
+                    <ToggleButton
+                      id="priority-high"
+                      value="Alta"
+                      variant={
+                        watch("priority") === "Alta"
+                          ? "warning"
+                          : "outline-warning"
+                      }
                     >
                       Alta
                     </ToggleButton>
@@ -451,7 +484,7 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
 
             {resourcesError && (
               <div className="alert alert-warning py-2">
-                <small>{resourcesError}</small>
+                <small>No hay recursos</small>
               </div>
             )}
 
@@ -466,14 +499,14 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
                 ) : (
                   allResources.map((res) => (
                     <option key={res.idResource} value={res.idResource}>
-                      {res.resourceDescription} 
+                      {res.resourceDescription}
                     </option>
                   ))
                 )}
               </Form.Select>
 
-              <Button 
-                variant="dark" 
+              <Button
+                variant="dark"
                 onClick={handleAddResource}
                 disabled={!selectedResource || allResources.length === 0}
               >
@@ -485,15 +518,23 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
             <input
               type="hidden"
               {...register("assignedResources", {
-                validate: validateAssignedResources
+                validate: validateAssignedResources,
               })}
             />
 
             {/* Lista de recursos asignados */}
-            <div className={`mt-2 p-2 border rounded ${errors.assignedResources ? 'border-danger' : ''}`}>
-              <Form.Label className="small mb-2">Recursos asignados:</Form.Label>
+            <div
+              className={`mt-2 p-2 border rounded ${
+                errors.assignedResources ? "border-danger" : ""
+              }`}
+            >
+              <Form.Label className="small mb-2">
+                Recursos asignados:
+              </Form.Label>
               {assignedResources.length === 0 ? (
-                <p className="text-muted small mb-0">No hay recursos asignados.</p>
+                <p className="text-muted small mb-0">
+                  No hay recursos asignados.
+                </p>
               ) : (
                 assignedResources.map((id) => {
                   const res = allResources.find((r) => r.idResource === id);
@@ -519,25 +560,27 @@ const CreateTaskModal = ({ show, onHide, idFunction, taskData, isLoading, onTask
           </Form.Group>
 
           {/* Mensaje de campos obligatorios */}
-          <div className="text-muted small">
-            * Campos obligatorios
-          </div>
+          <div className="text-muted small">* Campos obligatorios</div>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button 
-            variant="light" 
-            onClick={handleCloseAndReset} 
+          <Button
+            variant="light"
+            onClick={handleCloseAndReset}
             disabled={isSubmitting || isLoading}
           >
             Cancelar
           </Button>
-          <Button 
-            variant="dark" 
-            type="submit" 
+          <Button
+            variant="dark"
+            type="submit"
             disabled={isSubmitting || isLoading}
           >
-            {isSubmitting || isLoading ? "Procesando..." : (isEditMode ? "Guardar Cambios" : "Crear Tarea")}
+            {isSubmitting || isLoading
+              ? "Procesando..."
+              : isEditMode
+              ? "Guardar Cambios"
+              : "Crear Tarea"}
           </Button>
         </Modal.Footer>
       </Form>

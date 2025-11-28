@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Accordion, Button, Badge, Card, Row, Col } from "react-bootstrap";
+import { Accordion, Button, Badge, Card, Row, Col, Alert } from "react-bootstrap";
 import { BsPlusLg } from "react-icons/bs";
 import IncidentModal from "../incidentModal/IncidentModal";
 import "../incidentModal/incidentModal.css";
@@ -45,6 +45,7 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
   const [selectedIncidence, setSelectedIncidence] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [userRole, setUserRole] = useState("");
+  const [alertInfo, setAlertInfo] = useState({ show: false, message: "", type: "" });
 
   useEffect(() => {
     const storedUserStr = localStorage.getItem("user");
@@ -59,6 +60,17 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
       }
     }
   }, []);
+
+  // Efecto para auto-ocultar el alert después de 5 segundos
+  useEffect(() => {
+    if (alertInfo.show) {
+      const timer = setTimeout(() => {
+        setAlertInfo({ show: false, message: "", type: "" });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertInfo.show]);
+
   const verifyToken = () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -81,73 +93,131 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
     }
   };
 
+  // Función para mostrar alertas
+  const showAlert = (message, type = "success") => {
+    setAlertInfo({ show: true, message, type });
+  };
+
   // Función para manejar la agregar incidencia
   const handleAddIncidence = () => {
     setSelectedIncidence(null);
     setShowModal(true);
   };
 
-  // ⭐ FUNCIÓN CORREGIDA PARA EL POST CON EL FORMATO EXACTO
-  const handleSubmitIncidence = async (incidenceData) => {
+  // Función para manejar la edición de incidencia
+  const handleEditIncidence = (incidence) => {
+    setSelectedIncidence(incidence);
+    setShowModal(true);
+  };
+
+  // ⭐ FUNCIÓN MODIFICADA - Maneja el cierre del modal y muestra alerta
+ const handleSubmitIncidence = async (incidenceData) => {
+  setIsLoading(true);
+  try {
+    const tokenValidation = verifyToken();
+    if (!tokenValidation.isValid) throw new Error(tokenValidation.message);
+
+    const isEditing = !!selectedIncidence;
+    const url = isEditing 
+      ? `http://localhost:5111/api/Incidence/${selectedIncidence.id || selectedIncidence.idIncidence}`
+      : "http://localhost:5111/api/Incidence";
+
+    const incidencePayload = {
+      idProyect: projectId,
+      typeIncidence: incidenceData.tipo,
+      descriptionIncidence: incidenceData.descripcion,
+    };
+
+    if (isEditing && incidenceData.estado) {
+      incidencePayload.incidenceState = incidenceData.estado;
+    }
+
+    const response = await fetch(url, {
+      method: isEditing ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenValidation.token}`,
+      },
+      body: JSON.stringify(incidencePayload),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      throw new Error("Sesión expirada.");
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    // ⭐ CAMBIO IMPORTANTE:
+    // NO cerramos el modal aquí (setShowModal(false))
+    // NO mostramos alerta aquí (showAlert)
+    // Solo retornamos éxito para que el Modal sepa que todo salió bien
+    return true; 
+
+  } catch (error) {
+    console.error("Error:", error);
+    // Aquí sí podemos mostrar alerta en el padre si falla catastróficamente
+    showAlert(`Error: ${error.message}`, "danger");
+    return false;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// 2. Crea una función para cerrar el modal y refrescar la lista
+const handleCloseModal = () => {
+  //setShowModal(false);
+  setSelectedIncidence(null);
+  // Refrescamos la lista SOLO cuando el modal se cierra visualmente
+  
+  if (onIncidenceAdded) {
+    onIncidenceAdded();
+  }
+};
+
+  // Función para eliminar incidencia
+  const handleDeleteIncidence = async (incidenceId) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar esta incidencia?")) {
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Verificar token antes de enviar
       const tokenValidation = verifyToken();
       if (!tokenValidation.isValid) {
         throw new Error(tokenValidation.message);
       }
 
-      // ⭐ PAYLOAD EXACTO CON EL FORMATO ESPECIFICADO
-      const incidencePayload = {
-        idProyect: projectId, // Usar el projectId que viene como prop
-        typeIncidence: incidenceData.tipo,
-        descriptionIncidence: incidenceData.descripcion,
-      };
-
-
-      // ⭐ POST A LA RUTA CORRECTA CON AUTENTICACIÓN
-      const response = await fetch("http://localhost:5111/api/Incidence", {
-        method: "POST",
+      const response = await fetch(`http://localhost:5111/api/Incidence/${incidenceId}`, {
+        method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${tokenValidation.token}`,
         },
-        body: JSON.stringify(incidencePayload),
       });
 
-      // Manejar error 401
       if (response.status === 401) {
         localStorage.removeItem("token");
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente."
-        );
+        throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Error ${response.status}: ${errorText || response.statusText}`
-        );
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      // Mostrar alerta de éxito
+      showAlert("Incidencia eliminada correctamente", "success");
 
-      setShowModal(false);
-      setSelectedIncidence(null);
-
+      // Llamar a la función para refrescar los datos
       if (onIncidenceAdded) {
         onIncidenceAdded();
       }
 
-      alert("Incidencia creada exitosamente");
     } catch (error) {
-      console.error("Error al crear incidencia:", error);
-
-      if (error.message.includes("sesión") || error.message.includes("token")) {
-        alert(`Error de autenticación: ${error.message}`);
-      } else {
-        alert("Error al crear la incidencia: " + error.message);
-      }
+      console.error("Error al eliminar incidencia:", error);
+      showAlert(`Error: ${error.message}`, "danger");
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +230,18 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
           Incidencias
         </Accordion.Header>
         <Accordion.Body>
+          {/* Alert de Bootstrap */}
+          {alertInfo.show && (
+            <Alert 
+              variant={alertInfo.type} 
+              dismissible 
+              onClose={() => setAlertInfo({ show: false, message: "", type: "" })}
+              className="mb-3"
+            >
+              {alertInfo.message}
+            </Alert>
+          )}
+
           <div className="section-header mb-3">
             <div className="d-flex justify-content-between align-items-center">
               <h5 className="mb-0">
@@ -178,7 +260,6 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                 >
                   <BsPlusLg className="me-1" /> Agregar Incidencia
                 </Button>
-
               )}
             </div>
           </div>
@@ -233,6 +314,9 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
                           <small className="text-muted d-block mt-1">
                             ID Proyecto: {inc.idProyect || projectId}
                           </small>
+                          
+                          {/* Botones de acción */}
+                          
                         </div>
                       </div>
                     </Card.Body>
@@ -250,15 +334,12 @@ const Incidence = ({ incidences, onIncidenceAdded, projectId }) => {
 
           <IncidentModal
             show={showModal}
-            onHide={() => {
-              setShowModal(false);
-              setSelectedIncidence(null);
-            }}
+            onHide={handleCloseModal} // ⭐ Usamos la nueva función
             onSubmit={handleSubmitIncidence}
             incidenceData={selectedIncidence}
             isLoading={isLoading}
             projectId={projectId}
-            incidenceTypes={incidenceTypes} // Pasamos el array de tipos al modal
+            incidenceTypes={incidenceTypes}
           />
         </Accordion.Body>
       </Accordion.Item>

@@ -1,8 +1,24 @@
 import { NavLink } from "react-router-dom";
 import "./home.css";
 import { Folder, FileText, Home, User } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const HomePage = () => {
+  const [userRole, setUserRole] = useState("");
+  useEffect(() => {
+    const storedUserStr = localStorage.getItem("user");
+    if (storedUserStr) {
+      try {
+        const userObj = JSON.parse(storedUserStr);
+        if (userObj && userObj.rolEmployee) {
+          setUserRole(userObj.rolEmployee);
+        }
+      } catch (error) {
+        console.error("Error al leer usuario:", error);
+      }
+    }
+  }, []);
+
   return (
     <div className="home-container">
       <div className="home-header">
@@ -17,18 +33,21 @@ const HomePage = () => {
           <h2>Proyectos</h2>
           <p>Gestiona y visualiza todos tus proyectos</p>
         </NavLink>
+        {["Administrator"].includes(userRole) && (
+          <div className="home-cards">
+            <NavLink to="/customers" className="card">
+              <User className="card-icon" size={36} />
+              <h2>Clientes</h2>
+              <p>Consulta proyectos del cliente</p>
+            </NavLink>
 
-        <NavLink to="/customers" className="card">
-          <User className="card-icon" size={36} />
-          <h2>Clientes</h2>
-          <p>Consulta proyectos del cliente</p>
-        </NavLink>
-
-        <NavLink to="/reports" className="card">
-          <FileText className="card-icon" size={36} />
-          <h2>Reportes</h2>
-          <p>Consulta reportes y estadísticas</p>
-        </NavLink>
+            <NavLink to="/reports" className="card">
+              <FileText className="card-icon" size={36} />
+              <h2>Reportes</h2>
+              <p>Consulta reportes y estadísticas</p>
+            </NavLink>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -160,11 +160,13 @@ const ListProjects = () => {
       )
     );
   };
-const handleDeleteProject = (deletedProjectId) => {
-  setProyectos(prevProyectos => 
-    prevProyectos.filter(project => project.idProject !== deletedProjectId)
-  );
-};
+
+  const handleDeleteProject = (deletedProjectId) => {
+    setProyectos(prevProyectos => 
+      prevProyectos.filter(project => project.idProject !== deletedProjectId)
+    );
+  };
+
   // Asegurar que proyectos siempre sea un array antes de usar filter
   const proyectosFiltrados = Array.isArray(proyectos)
     ? proyectos.filter(
@@ -178,6 +180,20 @@ const handleDeleteProject = (deletedProjectId) => {
   const indexUltimo = paginaActual * proyectosPorPagina;
   const indexPrimero = indexUltimo - proyectosPorPagina;
   const proyectosPagina = proyectosFiltrados.slice(indexPrimero, indexUltimo);
+
+  // ⭐ CREAR ARRAY CON EXACTAMENTE 5 ELEMENTOS
+  const filasParaMostrar = [];
+  
+  // Agregar los proyectos reales
+  for (let i = 0; i < proyectosPorPagina; i++) {
+    if (i < proyectosPagina.length) {
+      // Si hay proyecto real, agregarlo
+      filasParaMostrar.push(proyectosPagina[i]);
+    } else {
+      // Si no hay proyecto, agregar null para fila vacía
+      filasParaMostrar.push(null);
+    }
+  }
 
   const totalPaginas = Math.ceil(
     proyectosFiltrados.length / proyectosPorPagina
@@ -255,64 +271,77 @@ const handleDeleteProject = (deletedProjectId) => {
             </thead>
 
             <tbody>
-              {proyectosPagina.length > 0 ? (
-                proyectosPagina.map((project) => (
-                  <tr className="text-center" key={project.idProject}>
-                    <td>{project.idProject}</td>
-                    <td>{project.nameProject}</td>
-                    <td>{project.clientName}</td>
-                    <td>
-                      {traduccionesEstado[project.stateProject] ||
-                        project.stateProject}
-                    </td>
-                    <td>{project.teamNumber}</td>
+              {filasParaMostrar.map((project, index) => (
+                <tr className="text-center" key={project ? project.idProject : `empty-${index}`}>
+                  {project ? (
+                    // ⭐ FILA CON DATOS REALES
+                    <>
+                      <td>{project.idProject}</td>
+                      <td>{project.nameProject}</td>
+                      <td>{project.clientName}</td>
+                      <td>
+                        {traduccionesEstado[project.stateProject] ||
+                          project.stateProject}
+                      </td>
+                      <td>{project.teamNumber}</td>
+                      <td>
+                        <Dropdown>
+                          <Dropdown.Toggle variant="warning" size="sm">
+                            Opciones
+                          </Dropdown.Toggle>
 
-                    <td>
-                      <Dropdown>
-                        <Dropdown.Toggle variant="warning" size="sm">
-                          Opciones
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                          <Dropdown.Item
-                            onClick={() =>
-                              navigate(`/projectslist/${project.idProject}`)
-                            }
-                          >
-                            Ver detalles
-                          </Dropdown.Item>
-
-                          {["Administrator"].includes(userRole) && (
-                            <div>
-                              <Dropdown.Item
-                                onClick={() => handleShowUpdateModal(project)}
-                              >
-                                Modificar
-                              </Dropdown.Item>
-                            <Dropdown.Item>
-                              <DeleteButton
-                                idProject={project.idProject}
-                                projectName={project.nameProject}
-                                onDelete={handleDeleteProject}
-                              />
-                            </Dropdown.Item>
+                          <Dropdown.Menu>
                             <Dropdown.Item
-                            onClick={() =>
-                              navigate(`/projectslist/history/${project.idProject}`)
-                            }
+                              onClick={() =>
+                                navigate(`/projectslist/${project.idProject}`)
+                              }
                             >
-                              Historial
-                              
+                              Ver detalles
                             </Dropdown.Item>
-                            </div>
-                          )}
 
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+                            {["Administrator"].includes(userRole) && (
+                              <div>
+                                <Dropdown.Item
+                                  onClick={() => handleShowUpdateModal(project)}
+                                >
+                                  Modificar
+                                </Dropdown.Item>
+                                <Dropdown.Item>
+                                  <DeleteButton
+                                    idProject={project.idProject}
+                                    projectName={project.nameProject}
+                                    onDelete={handleDeleteProject}
+                                  />
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                  onClick={() =>
+                                    navigate(`/projectslist/history/${project.idProject}`)
+                                  }
+                                >
+                                  Historial
+                                </Dropdown.Item>
+                              </div>
+                            )}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </td>
+                    </>
+                  ) : (
+                    // ⭐ FILA VACÍA
+                    <>
+                      <td className="text-muted">-</td>
+                      <td className="text-muted">-</td>
+                      <td className="text-muted">-</td>
+                      <td className="text-muted">-</td>
+                      <td className="text-muted">-</td>
+                      <td className="text-muted">-</td>
+                    </>
+                  )}
+                </tr>
+              ))}
+              
+              {/* ⭐ MENSAJE CUANDO NO HAY PROYECTOS EN ABSOLUTO */}
+              {proyectosFiltrados.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-4">
                     {proyectos.length === 0 ? (

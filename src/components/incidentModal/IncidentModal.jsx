@@ -49,6 +49,8 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
         descripcion: ""
       });
     }
+    // Limpiar alert cuando se abre/cierra el modal
+    setShowAlert(false);
   }, [incidenceData, show, reset, setValue]);
 
   // Función para mostrar alertas
@@ -64,34 +66,40 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
     onHide();
   };
 
-  const onSubmitForm = async (data) => {
-    try {
-      // ⭐ PAYLOAD EXACTO CON SOLO LOS 3 CAMPOS REQUERIDOS
-      const payload = {
-        tipo: data.tipo,
-        descripcion: data.descripcion.trim()
-      };
+ const onSubmitForm = async (data) => {
+  try {
+    const payload = {
+      tipo: data.tipo,
+      descripcion: data.descripcion.trim()
+    };
 
-      // ✅ Llamar a la función onSubmit del componente padre
-      if (onSubmit) {
-        await onSubmit(payload);
-        
-        // Mostrar alerta de éxito
+    if (onSubmit) {
+      // Esperamos el resultado del padre
+      const success = await onSubmit(payload);
+
+      // ⭐ Solo si el padre devolvió true (éxito)
+      if (success) {
+        // 1. Mostrar alerta DENTRO del modal
         showAlertMessage(
           incidenceData 
             ? "¡Incidencia actualizada exitosamente!" 
             : "¡Incidencia registrada exitosamente!",
           "success"
         );
+        
+        // 2. Esperar 1.5 o 2 segundos para que el usuario lea el mensaje
+        setTimeout(() => {
+            handleClose(); // Esto llamará al onHide del padre
+        }, 1500);
       }
-    } catch (error) {
-      // Mostrar alerta de error
-      showAlertMessage(
-        error.message || "Error al procesar la incidencia",
-        "danger"
-      );
     }
-  };
+  } catch (error) {
+    showAlertMessage(
+      error.message || "Error al procesar la incidencia",
+      "danger"
+    );
+  }
+};
 
   return (
     <Modal show={show} onHide={handleClose} centered>
@@ -104,7 +112,6 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
 
       <Form onSubmit={handleSubmit(onSubmitForm)} noValidate>
         <Modal.Body>
-          {/* ✅ ALERT BOOTSTRAP POR DEFECTO */}
           <Alert 
             show={showAlert} 
             variant={alertVariant} 
@@ -169,12 +176,12 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
                   message: "La descripción debe tener al menos 10 caracteres"
                 },
                 maxLength: {
-                  value: 500,
-                  message: "La descripción no puede exceder 500 caracteres"
+                  value: 60,
+                  message: "La descripción no puede exceder 60 caracteres"
                 },
                 pattern: {
-                  value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,!?()]+$/,
-                  message: "La descripción contiene caracteres no válidos"
+                  value: /^(?![0-9]+$)[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                  message: "La descripción no puede contener solo números ni caracteres inválidos"
                 },
                 validate: {
                   notOnlySpaces: value => 
@@ -190,7 +197,7 @@ const IncidentModal = ({ show, onHide, onSubmit, incidenceData, isLoading, proje
             </Form.Control.Feedback>
             <Form.Text className="text-muted">
               Describa detalladamente la incidencia, incluyendo el impacto y las
-              acciones necesarias. {watchDescripcion.length}/500 caracteres
+              acciones necesarias. {watchDescripcion.length}/60 caracteres
             </Form.Text>
           </Form.Group>
 

@@ -260,8 +260,8 @@ const CreateProject = () => {
                     message: "El nombre no puede exceder 100 caracteres",
                   },
                   pattern: {
-                    value: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
-                    message: "El nombre contiene caracteres no válidos",
+                    value: /^(?![0-9]+$)[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                    message: "El nombre no puede contener solo números ni caracteres inválidos",
                   },
                 })}
                 type="text"
@@ -325,6 +325,10 @@ const CreateProject = () => {
                   maxLength: {
                     value: 50,
                     message: "La descripción no puede exceder 50 caracteres",
+                  },
+                  pattern: {
+                    value: /^(?![0-9]+$)[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-_.,()]+$/,
+                    message: "La descripción contiene caracteres no válidos",
                   },
                 })}
                 isInvalid={!!errors.descriptionProject}
